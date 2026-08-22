@@ -1,0 +1,12 @@
+services:
+  sonic-nex:
+    build: .
+    container_name: sonic-nex
+    restart: unless-stopped
+    env_file:
+      - .env
+    # NEX reflects peers' observed UDP addresses back to the consoles. Host
+    # networking preserves those source addresses on a Linux server.
+    network_mode: host
+    volumes:
+      - ./data:/app/data

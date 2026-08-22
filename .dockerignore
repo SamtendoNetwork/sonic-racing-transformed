@@ -1,0 +1,12 @@
+.git
+.github
+.env
+.env.*
+accounts.json
+accounts.*.json
+build
+data
+*.log
+*.pcap
+*.pcapng
+.venv

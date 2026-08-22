@@ -1,0 +1,31 @@
+# Runtime configuration and credentials
+.env
+.env.*
+!.env.example
+accounts.json
+accounts.*.json
+!accounts.example.json
+
+# Persistent server state
+data/*
+!data/.gitkeep
+
+# Build output and logs
+build/
+*.exe
+*.log
+coverage.out
+
+# Local tooling
+.venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Debug captures and temporary backups
+*.pcap
+*.pcapng
+*.bak
+*.orig
+*~
