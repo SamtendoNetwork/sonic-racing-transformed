@@ -273,3 +273,4 @@ This project is licensed under the GNU Affero General Public License, version 3
 or later. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 _Deployed and maintained as part of the [Protarium Network](https://github.com/Protarium-Network) Wii U online service revival project._
+_Derived from Pretendo Network’s original codebase (PretendoNetwork). Copyright (C) Pretendo Network contributors._
