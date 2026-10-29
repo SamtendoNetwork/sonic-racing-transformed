@@ -54,7 +54,7 @@ func (commonProtocol *CommonProtocol) completePostObjects(err error, packet nex.
 
 		if objectSizeS3 != uint64(objectSizeDB) {
 			common_globals.Logger.Errorf("Object with DataID %d did not upload correctly! Mismatched sizes", dataID)
-			// TODO - Is this a good error?
+
 			errorCode = nex.NewError(nex.ResultCodes.DataStore.Unknown, "change_error")
 			break
 		}

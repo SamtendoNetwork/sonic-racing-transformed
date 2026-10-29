@@ -4,7 +4,7 @@ import (
 	"crypto/rc4"
 )
 
-// QuazalRC4 encrypts data with RC4. Each iteration uses a new cipher instance. The key is always CD&ML
+
 type QuazalRC4 struct {
 	key             []byte
 	cipher          *rc4.Cipher
@@ -13,12 +13,12 @@ type QuazalRC4 struct {
 	decipheredCount uint64
 }
 
-// Key returns the crypto key
+
 func (r *QuazalRC4) Key() []byte {
 	return r.key
 }
 
-// SetKey sets the crypto key and updates the ciphers
+
 func (r *QuazalRC4) SetKey(key []byte) error {
 	r.key = key
 
@@ -38,7 +38,7 @@ func (r *QuazalRC4) SetKey(key []byte) error {
 	return nil
 }
 
-// Encrypt encrypts the payload with the outgoing QuazalRC4 stream
+
 func (r *QuazalRC4) Encrypt(payload []byte) ([]byte, error) {
 	r.SetKey([]byte("CD&ML"))
 
@@ -51,7 +51,7 @@ func (r *QuazalRC4) Encrypt(payload []byte) ([]byte, error) {
 	return ciphered, nil
 }
 
-// Decrypt decrypts the payload with the incoming QuazalRC4 stream
+
 func (r *QuazalRC4) Decrypt(payload []byte) ([]byte, error) {
 	r.SetKey([]byte("CD&ML"))
 
@@ -64,15 +64,15 @@ func (r *QuazalRC4) Decrypt(payload []byte) ([]byte, error) {
 	return deciphered, nil
 }
 
-// Copy returns a copy of the algorithm while retaining it's state
+
 func (r *QuazalRC4) Copy() Algorithm {
 	copied := NewQuazalRC4Encryption()
 
 	copied.SetKey(r.key)
 
-	// * crypto/rc4 does not expose a way to directly copy streams and retain their state.
-	// * This just discards the number of iterations done in the original ciphers to sync
-	// * the copied ciphers states to the original
+
+
+
 	for i := 0; i < int(r.cipheredCount); i++ {
 		copied.cipher.XORKeyStream([]byte{0}, []byte{0})
 	}
@@ -87,7 +87,7 @@ func (r *QuazalRC4) Copy() Algorithm {
 	return copied
 }
 
-// NewQuazalRC4Encryption returns a new instance of the QuazalRC4 encryption
+
 func NewQuazalRC4Encryption() *QuazalRC4 {
 	return &QuazalRC4{
 		key: make([]byte, 0),

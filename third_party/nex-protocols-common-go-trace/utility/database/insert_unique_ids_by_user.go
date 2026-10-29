@@ -9,8 +9,8 @@ import (
 	utility_types "github.com/PretendoNetwork/nex-protocols-go/v2/utility/types"
 )
 
-// InsertUniqueIDsByUser inserts a unique ID + password (if applicable) combination into the database, associated with the given user's PID
-// isPrimary is used to indicate if the 0th unique ID in the array should be set as a primary ID (in most cases, this should be true)
+
+
 func InsertUniqueIDsByUser(manager *common_globals.UtilityManager, userPID types.PID, uniqueIDInfos types.List[utility_types.UniqueIDInfo], isPrimary bool) *nex.Error {
 	var err error
 

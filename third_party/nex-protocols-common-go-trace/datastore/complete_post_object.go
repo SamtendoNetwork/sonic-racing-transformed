@@ -48,15 +48,15 @@ func (commonProtocol *CommonProtocol) completePostObject(err error, packet nex.P
 	connection := packet.Sender()
 	endpoint := connection.Endpoint()
 
-	// * If GetObjectInfoByDataID returns data then that means
-	// * the object has already been marked as uploaded. So do
-	// * nothing
+
+
+
 	_, errCode := commonProtocol.GetObjectInfoByDataID(param.DataID)
 	if errCode == nil {
 		return nil, nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
 	}
 
-	// * Only allow an objects owner to make this request
+
 	ownerPID, errCode := commonProtocol.GetObjectOwnerByDataID(param.DataID)
 	if errCode != nil {
 		return nil, errCode
@@ -83,7 +83,7 @@ func (commonProtocol *CommonProtocol) completePostObject(err error, packet nex.P
 
 		if objectSizeS3 != uint64(objectSizeDB) {
 			common_globals.Logger.Errorf("Object with DataID %d did not upload correctly! Mismatched sizes", param.DataID)
-			// TODO - Is this a good error?
+
 			return nil, nex.NewError(nex.ResultCodes.DataStore.Unknown, "change_error")
 		}
 

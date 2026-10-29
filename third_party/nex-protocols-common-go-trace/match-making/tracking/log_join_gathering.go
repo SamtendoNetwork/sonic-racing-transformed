@@ -9,7 +9,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// LogJoinGathering logs a gathering join event on the given database
+
 func LogJoinGathering(db *sql.DB, sourcePID types.PID, gatheringID uint32, newParticipants []uint64, totalParticipants []uint64) *nex.Error {
 	eventTime := time.Now().UTC()
 

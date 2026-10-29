@@ -9,7 +9,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// RetrieveAllMessagesWithinRange retrieves all messages available for the given recipient
+
 func RetrieveAllMessagesWithinRange(manager *common_globals.MessagingManager, recipientID types.UInt64, recipientType messaging_constants.RecipientType, resultRange types.ResultRange) (types.List[types.DataHolder], *nex.Error) {
 	lstMessages := make(types.List[types.DataHolder], 0, resultRange.Length)
 

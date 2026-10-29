@@ -8,7 +8,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// MatchmakingManager manages a matchmaking instance
+
 type MatchmakingManager struct {
 	Database                 *sql.DB
 	Endpoint                 *nex.PRUDPEndPoint
@@ -17,7 +17,7 @@ type MatchmakingManager struct {
 	GetDetailedGatheringByID func(manager *MatchmakingManager, sourcePID uint64, gatheringID uint32) (types.RVType, string, *nex.Error)
 }
 
-// NewMatchmakingManager returns a new MatchmakingManager
+
 func NewMatchmakingManager(endpoint *nex.PRUDPEndPoint, db *sql.DB) *MatchmakingManager {
 	return &MatchmakingManager{
 		Endpoint: endpoint,

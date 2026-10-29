@@ -8,7 +8,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// LogChangeHost logs a host change event on the given database
+
 func LogChangeHost(db *sql.DB, sourcePID types.PID, gatheringID uint32, oldHostPID types.PID, newHostPID types.PID) *nex.Error {
 	eventTime := time.Now().UTC()
 

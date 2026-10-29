@@ -10,7 +10,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetPersistentGatheringsByID gets the persistent gatherings from the given gathering IDs
+
 func GetPersistentGatheringsByID(manager *common_globals.MatchmakingManager, sourcePID types.PID, gatheringIDs []uint32) ([]match_making_types.PersistentGathering, *nex.Error) {
 	persistentGatherings := make([]match_making_types.PersistentGathering, 0)
 	rows, err := manager.Database.Query(`SELECT

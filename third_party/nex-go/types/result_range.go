@@ -5,15 +5,15 @@ import (
 	"strings"
 )
 
-// ResultRange is an implementation of rdv::ResultRange.
-// Holds information about how to make queries which may return large data.
+
+
 type ResultRange struct {
 	Structure
-	Offset UInt32 `json:"offset" db:"offset" bson:"offset" xml:"Offset"` // * Offset into the dataset
-	Length UInt32 `json:"length" db:"length" bson:"length" xml:"Length"` // * Number of items to return
+	Offset UInt32 `json:"offset" db:"offset" bson:"offset" xml:"Offset"`
+	Length UInt32 `json:"length" db:"length" bson:"length" xml:"Length"`
 }
 
-// WriteTo writes the ResultRange to the given writable
+
 func (rr ResultRange) WriteTo(writable Writable) {
 	contentWritable := writable.CopyNew()
 
@@ -27,7 +27,7 @@ func (rr ResultRange) WriteTo(writable Writable) {
 	writable.Write(content)
 }
 
-// ExtractFrom extracts the ResultRange from the given readable
+
 func (rr *ResultRange) ExtractFrom(readable Readable) error {
 	var err error
 
@@ -48,7 +48,7 @@ func (rr *ResultRange) ExtractFrom(readable Readable) error {
 	return nil
 }
 
-// Copy returns a new copied instance of ResultRange
+
 func (rr ResultRange) Copy() RVType {
 	copied := NewResultRange()
 
@@ -59,7 +59,7 @@ func (rr ResultRange) Copy() RVType {
 	return copied
 }
 
-// Equals checks if the input is equal in value to the current instance
+
 func (rr ResultRange) Equals(o RVType) bool {
 	if _, ok := o.(ResultRange); !ok {
 		return false
@@ -78,26 +78,26 @@ func (rr ResultRange) Equals(o RVType) bool {
 	return rr.Length.Equals(&other.Length)
 }
 
-// CopyRef copies the current value of the ResultRange
-// and returns a pointer to the new copy
+
+
 func (rr ResultRange) CopyRef() RVTypePtr {
 	copied := rr.Copy().(ResultRange)
 	return &copied
 }
 
-// Deref takes a pointer to the ResultRange
-// and dereferences it to the raw value.
-// Only useful when working with an instance of RVTypePtr
+
+
+
 func (rr *ResultRange) Deref() RVType {
 	return *rr
 }
 
-// String returns a string representation of the struct
+
 func (rr ResultRange) String() string {
 	return rr.FormatToString(0)
 }
 
-// FormatToString pretty-prints the struct data using the provided indentation level
+
 func (rr ResultRange) FormatToString(indentationLevel int) string {
 	indentationValues := strings.Repeat("\t", indentationLevel+1)
 	indentationEnd := strings.Repeat("\t", indentationLevel)
@@ -113,7 +113,7 @@ func (rr ResultRange) FormatToString(indentationLevel int) string {
 	return b.String()
 }
 
-// NewResultRange returns a new ResultRange
+
 func NewResultRange() ResultRange {
 	return ResultRange{
 		Offset: NewUInt32(0),

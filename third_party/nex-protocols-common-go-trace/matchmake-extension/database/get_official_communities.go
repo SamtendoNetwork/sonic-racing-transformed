@@ -10,7 +10,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetOfficialCommunities returns the official communities based on the given parameters
+
 func GetOfficialCommunities(manager *common_globals.MatchmakingManager, sourcePID types.PID, isAvailableOnly bool, resultRange types.ResultRange) ([]match_making_types.PersistentGathering, *nex.Error) {
 	persistentGatherings := make([]match_making_types.PersistentGathering, 0)
 	currentTime := time.Now().UTC()

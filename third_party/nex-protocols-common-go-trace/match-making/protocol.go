@@ -21,7 +21,7 @@ type CommonProtocol struct {
 	OnAfterUpdateSessionHost   func(packet nex.PacketInterface, gid types.UInt32, isMigrateOwner types.Bool)
 }
 
-// SetManager defines the matchmaking manager to be used by the common protocol
+
 func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.MatchmakingManager) {
 	var err error
 
@@ -148,7 +148,7 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 	}
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol match_making.Interface) *CommonProtocol {
 	endpoint := protocol.Endpoint().(*nex.PRUDPEndPoint)
 

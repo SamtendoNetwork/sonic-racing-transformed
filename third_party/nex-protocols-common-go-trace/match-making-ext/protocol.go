@@ -14,12 +14,12 @@ type CommonProtocol struct {
 	OnAfterEndParticipation func(acket nex.PacketInterface, idGathering types.UInt32, strMessage types.String)
 }
 
-// SetManager defines the matchmaking manager to be used by the common protocol
+
 func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.MatchmakingManager) {
 	commonProtocol.manager = manager
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol match_making_ext.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint: protocol.Endpoint(),

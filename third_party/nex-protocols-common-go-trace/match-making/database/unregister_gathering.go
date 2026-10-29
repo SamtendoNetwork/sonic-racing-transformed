@@ -7,7 +7,7 @@ import (
 	"github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making/tracking"
 )
 
-// UnregisterGathering unregisters a given gathering on a database
+
 func UnregisterGathering(manager *common_globals.MatchmakingManager, sourcePID types.PID, id uint32) *nex.Error {
 	result, err := manager.Database.Exec(`UPDATE matchmaking.gatherings SET registered=false WHERE id=$1`, id)
 	if err != nil {

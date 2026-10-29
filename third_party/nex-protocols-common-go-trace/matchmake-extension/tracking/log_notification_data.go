@@ -8,7 +8,7 @@ import (
 	notifications_types "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/types"
 )
 
-// LogNotificationData logs the update of the notification data of a user with UpdateNotificationData
+
 func LogNotificationData(db *sql.DB, notificationData notifications_types.NotificationEvent) *nex.Error {
 	eventTime := time.Now().UTC()
 

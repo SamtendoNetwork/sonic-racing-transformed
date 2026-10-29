@@ -1,16 +1,3 @@
-﻿"""End-to-end test of the Sonic Transformed NEX server.
-
-Drives the server with kinnay's NintendoClients - the same library used to talk
-to the real Nintendo servers - so what is exercised is the actual PRUDP/RMC wire
-protocol, not a mock.
-
-Covers: Kerberos login through the auth server, the handoff to the secure
-server, station URL registration, session create/browse/join, participant and
-peer URL lookup, host migration, leaderboards, and leaving.
-"""
-
-import hashlib
-import hmac
 import os
 import sys
 import traceback
@@ -20,30 +7,23 @@ import anyio
 from nintendo.nex import authentication, backend, common, matchmaking, ranking, secure, settings
 
 
-def auth_info():
-    """The extra login data a Wii U sends with TicketGranting::LoginEx.
-
-    Passing this makes NintendoClients call LoginEx (0x2) rather than the
-    legacy Login (0x1), which is what a real console does: the token is the
-    NEX token the account server issued for game server 0x10111F00.
-    """
+def auth_info(pid):
     info = authentication.AuthenticationInfo()
-    info.token = "e2e-test-token"
-    info.ngs_version = 3      # * Wii U
+    info.token = TOKENS[pid]
+    info.ngs_version = 3
     info.token_type = 1
     info.server_version = 3
     return info
 
-HOST = "127.0.0.1"
-AUTH_PORT = 60000
+HOST = os.environ.get("E2E_HOST", "127.0.0.1")
+AUTH_PORT = int(os.environ.get("E2E_AUTH_PORT", "60000"))
 ACCESS_KEY = "b26a3421"
-NEX_VERSION = 30001  # * 3.0.1
+NEX_VERSION = 30001
 
-ACCOUNT_SECRET = "e2e-test-secret"
-ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-PID_A = 1800000001
-PID_B = 1800000002
+PID_A = int(os.environ["E2E_PID_A"])
+PID_B = int(os.environ["E2E_PID_B"])
+PASSWORDS = {PID_A: os.environ["E2E_PASSWORD_A"], PID_B: os.environ["E2E_PASSWORD_B"]}
+TOKENS = {PID_A: os.environ["E2E_TOKEN_A"], PID_B: os.environ["E2E_TOKEN_B"]}
 
 failures = []
 passes = []
@@ -58,21 +38,10 @@ def check(name, condition, detail=""):
         print(f"  FAIL  {name}" + (f"  ({detail})" if detail else ""))
 
 
-def derive_password(pid):
-    """Mirror of globals.DerivePassword in the Go server."""
-    mac = hmac.new(ACCOUNT_SECRET.encode(), f"nex:{pid}".encode(), hashlib.sha256).digest()
-    return "".join(ALPHABET[mac[i] % len(ALPHABET)] for i in range(16))
-
-
 def make_settings():
     s = settings.default()
     s.configure(ACCESS_KEY, NEX_VERSION)
 
-    # * The PRUDP minor version the client announces is what actually decides
-    # * whether NEX structures carry version/length headers: NintendoClients
-    # * turns them on at minor version 3 and above. Running the suite at both 4
-    # * and 2 exercises both wire formats, which is the point - nobody knows
-    # * which one the real console uses, so the server has to handle either.
     s["prudp.minor_version"] = int(os.environ.get("E2E_MINOR_VERSION", "4"))
 
     return s
@@ -103,14 +72,7 @@ def new_session(game_mode=1, attribs=None, max_participants=8):
     return session
 
 
-async def register_station(client, label):
-    """Publish station URLs, exactly as a console does after connecting.
-
-    This is what makes peer-to-peer play possible: the server records where
-    each player can be reached and hands those addresses to the others. The
-    local address we claim here is deliberately a LAN one - the server should
-    replace the public station's address with the address it actually observes.
-    """
+async def register_station(client, label, pid):
     conn = secure.SecureConnectionClient(client)
 
     local = common.StationURL(
@@ -118,7 +80,7 @@ async def register_station(client, label):
         type=1, upnp=0, pmp=0, sid=15,
     )
 
-    result = await conn.register_ex([local], auth_info())
+    result = await conn.register_ex([local], auth_info(pid))
     print(f"        {label} public station: {result.public_station}")
     return result
 
@@ -148,9 +110,9 @@ async def main():
     print("\n=== 1. Authentication (Kerberos via ticket granting) ===")
 
     async with backend.connect(s, HOST, AUTH_PORT) as be_a:
-        async with be_a.login(str(PID_A), derive_password(PID_A), auth_info()) as client_a:
+        async with be_a.login(str(PID_A), PASSWORDS[PID_A], auth_info(PID_A)) as client_a:
             check("client A logged in and reached the secure server", True, f"pid={PID_A}")
-            await register_station(client_a, "A")
+            await register_station(client_a, "A", PID_A)
 
             mm_a = matchmaking.MatchmakeExtensionClient(client_a)
             mmext_a = matchmaking.MatchMakingClientExt(client_a)
@@ -169,9 +131,9 @@ async def main():
             print("\n=== 3. Second player joins ===")
 
             async with backend.connect(s, HOST, AUTH_PORT) as be_b:
-                async with be_b.login(str(PID_B), derive_password(PID_B), auth_info()) as client_b:
+                async with be_b.login(str(PID_B), PASSWORDS[PID_B], auth_info(PID_B)) as client_b:
                     check("client B logged in", True, f"pid={PID_B}")
-                    await register_station(client_b, "B")
+                    await register_station(client_b, "B", PID_B)
 
                     mm_b = matchmaking.MatchmakeExtensionClient(client_b)
                     mmext_b = matchmaking.MatchMakingClientExt(client_b)
@@ -244,16 +206,16 @@ async def main():
 
                     score_a = ranking.RankingScoreData()
                     score_a.category = 7
-                    score_a.score = 9000        # * lap time in ms; lower is better
-                    score_a.order = 0           # * ascending
-                    score_a.update_mode = 0     # * keep the better score
+                    score_a.score = 9000
+                    score_a.order = 0
+                    score_a.update_mode = 0
                     score_a.groups = b"\x00\x00"
                     score_a.param = 111
                     await rank_a.upload_score(score_a, 0)
 
                     score_b = ranking.RankingScoreData()
                     score_b.category = 7
-                    score_b.score = 8000        # * faster than A
+                    score_b.score = 8000
                     score_b.order = 0
                     score_b.update_mode = 0
                     score_b.groups = b"\x00\x00"
@@ -281,7 +243,6 @@ async def main():
                               f"ranks {first.rank},{second.rank}")
                         check("score param round-tripped", first.param == 222, str(first.param))
 
-                    # * A worse score must not replace a better one under update_mode 0.
                     worse = ranking.RankingScoreData()
                     worse.category = 7
                     worse.score = 12000
@@ -323,11 +284,10 @@ async def main():
             await mm_a.update_application_buffer(gid, b"\x01")
             check("owner still controls the gathering", True)
 
-    # * Client A's connection is now closed, which should reap its gathering.
     await anyio.sleep(1.0)
 
     async with backend.connect(s, HOST, AUTH_PORT) as be_c:
-        async with be_c.login(str(PID_A), derive_password(PID_A), auth_info()) as client_c:
+        async with be_c.login(str(PID_A), PASSWORDS[PID_A], auth_info(PID_A)) as client_c:
             mm_c = matchmaking.MatchmakeExtensionClient(client_c)
             remaining = await mm_c.find_matchmake_session_by_gathering_id([gid])
             check("gathering was reaped when the owner disconnected",
@@ -340,7 +300,7 @@ async def main():
                   created.id > 0 and created.owner == PID_A, f"gid={created.id}")
 
             async with backend.connect(s, HOST, AUTH_PORT) as be_d:
-                async with be_d.login(str(PID_B), derive_password(PID_B), auth_info()) as client_d:
+                async with be_d.login(str(PID_B), PASSWORDS[PID_B], auth_info(PID_B)) as client_d:
                     mm_d = matchmaking.MatchmakeExtensionClient(client_d)
                     matched = await mm_d.auto_matchmake_postpone(new_session(game_mode=5), "auto")
                     check("AutoMatchmake matched the existing session instead of creating one",
@@ -354,7 +314,6 @@ async def main():
 
 
 def flatten(exc, depth=0):
-    """anyio wraps everything in nested ExceptionGroups; show only the leaves."""
     if isinstance(exc, BaseExceptionGroup):
         for sub in exc.exceptions:
             flatten(sub, depth + 1)
@@ -370,7 +329,7 @@ def flatten(exc, depth=0):
 if __name__ == "__main__":
     try:
         anyio.run(main)
-    except BaseException as exc:  # noqa: BLE001
+    except BaseException as exc:
         flatten(exc)
         failures.append("unhandled exception")
 

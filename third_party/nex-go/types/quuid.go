@@ -10,17 +10,17 @@ import (
 	"strings"
 )
 
-// QUUID is an implementation of rdv::qUUID.
-// Type alias of []byte.
-// Encodes a UUID in little-endian byte order.
+
+
+
 type QUUID []byte
 
-// WriteTo writes the QUUID to the given writable
+
 func (qu QUUID) WriteTo(writable Writable) {
 	writable.Write(qu)
 }
 
-// ExtractFrom extracts the QUUID from the given readable
+
 func (qu *QUUID) ExtractFrom(readable Readable) error {
 	if readable.Remaining() < 16 {
 		return errors.New("Not enough data left to read qUUID")
@@ -30,12 +30,12 @@ func (qu *QUUID) ExtractFrom(readable Readable) error {
 	return nil
 }
 
-// Copy returns a new copied instance of qUUID
+
 func (qu QUUID) Copy() RVType {
 	return NewQUUID(qu)
 }
 
-// Equals checks if the passed Structure contains the same data as the current instance
+
 func (qu QUUID) Equals(o RVType) bool {
 	if _, ok := o.(QUUID); !ok {
 		return false
@@ -44,26 +44,26 @@ func (qu QUUID) Equals(o RVType) bool {
 	return bytes.Equal(qu, o.(QUUID))
 }
 
-// CopyRef copies the current value of the QUUID
-// and returns a pointer to the new copy
+
+
 func (qu QUUID) CopyRef() RVTypePtr {
 	copied := qu.Copy().(QUUID)
 	return &copied
 }
 
-// Deref takes a pointer to the QUUID
-// and dereferences it to the raw value.
-// Only useful when working with an instance of RVTypePtr
+
+
+
 func (qu *QUUID) Deref() RVType {
 	return *qu
 }
 
-// String returns a string representation of the struct
+
 func (qu QUUID) String() string {
 	return qu.FormatToString(0)
 }
 
-// FormatToString pretty-prints the struct data using the provided indentation level
+
 func (qu QUUID) FormatToString(indentationLevel int) string {
 	indentationValues := strings.Repeat("\t", indentationLevel+1)
 	indentationEnd := strings.Repeat("\t", indentationLevel)
@@ -77,14 +77,14 @@ func (qu QUUID) FormatToString(indentationLevel int) string {
 	return b.String()
 }
 
-// GetStringValue returns the UUID encoded in the qUUID
+
 func (qu QUUID) GetStringValue() string {
-	// * Create copy of the data since slices.Reverse modifies the slice in-line
+
 	data := make([]byte, len(qu))
 	copy(data, qu)
 
 	if len(data) != 16 {
-		// * Default dummy UUID as found in WATCH_DOGS
+
 		return "00000000-0000-0000-0000-000000000002"
 	}
 
@@ -121,7 +121,7 @@ func (qu QUUID) GetStringValue() string {
 	return b.String()
 }
 
-// FromString converts a UUID string to a qUUID
+
 func (qu *QUUID) FromString(uuid string) error {
 	sections := strings.Split(uuid, "-")
 	if len(sections) != 5 {
@@ -178,11 +178,11 @@ func (qu *QUUID) FromString(uuid string) error {
 	return nil
 }
 
-// Value implements the sql.Valuer interface for QUUID.
-// Returns the result of QUUID.GetStringValue()
-//
-// Only designed for Postgres databases, and only for
-// `text` and `uuid` column types
+
+
+
+
+
 func (qu QUUID) Value() (driver.Value, error) {
 	if len(qu) == 0 {
 		return nil, nil
@@ -192,14 +192,14 @@ func (qu QUUID) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid QUUID bytes length: %d", len(qu))
 	}
 
-	// * Just return as a basic UUID, not one of the
-	// * fancy ones Postgres supports
+
+
 	return qu.GetStringValue(), nil
 }
 
-// Scan implements the sql.Scanner interface for QUUID
-//
-// Only designed for Postgres databases
+
+
+
 func (qu *QUUID) Scan(value any) error {
 	if value == nil {
 		return nil
@@ -215,15 +215,15 @@ func (qu *QUUID) Scan(value any) error {
 		return fmt.Errorf("cannot scan type %T into QUUID", v)
 	}
 
-	// * While Postgres supports many formats for UUID *inputs*,
-	// * the UUID *output* is always in the standard form:
-	// * https://www.postgresql.org/docs/current/datatype-uuid.html
-	// * "Output is always in the standard form."
+
+
+
+
 
 	return qu.FromString(uuid)
 }
 
-// NewQUUID returns a new qUUID
+
 func NewQUUID(input []byte) QUUID {
 	qu := make(QUUID, len(input))
 	copy(qu, input)

@@ -50,7 +50,7 @@ func (commonProtocol *CommonProtocol) login(err error, packet nex.PacketInterfac
 	pConnectionData := types.NewRVConnectionData()
 	strReturnMsg := types.NewString("")
 
-	// * If any errors are triggered, return them in %retval%
+
 	if errorCode != nil {
 		retval = types.NewQResultError(errorCode.ResultCode)
 	} else {

@@ -16,7 +16,7 @@ type CommonProtocol struct {
 	StationURLSpecialProtocols types.StationURL
 	BuildName                  types.String
 	allowInsecureLoginMethod   bool
-	SessionKeyLength           int // TODO - Use server SessionKeyLength?
+	SessionKeyLength           int
 	SecureServerAccount        *nex.Account
 	SourceKeyFromToken         func(sourceAccount *nex.Account, loginData types.DataHolder) ([]byte, *nex.Error)
 	ValidateLoginData          func(pid types.PID, loginData types.DataHolder) *nex.Error
@@ -25,25 +25,25 @@ type CommonProtocol struct {
 	OnAfterRequestTicket       func(packet nex.PacketInterface, idSource types.PID, idTarget types.PID)
 }
 
-// DisableInsecureLogin disables the insecure Login method
+
 func (commonProtocol *CommonProtocol) DisableInsecureLogin() {
 	commonProtocol.allowInsecureLoginMethod = false
 }
 
-// EnableInsecureLogin enables the insecure Login method. Do not enable this on any servers outside friends and NEX 1 games
+
 func (commonProtocol *CommonProtocol) EnableInsecureLogin() {
 	common_globals.Logger.Warning("Insecure Login has been enabled. This MUST NOT be enabled on any servers outside friends or NEX 1 games or with EnableInsecureRegister at the same time. Use with caution!")
 	commonProtocol.allowInsecureLoginMethod = true
 }
 
-// ConfigurePNValidation configures the servers game server IDs for use in validating NEX login data
+
 func (commonProtocol *CommonProtocol) ConfigurePNValidation(gameServerIDs []string) {
 	commonProtocol.ValidateLoginData = func(pid types.PID, loginData types.DataHolder) *nex.Error {
 		return common_globals.ValidatePNLoginData(pid, loginData, gameServerIDs)
 	}
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol ticket_granting.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		protocol:                   protocol,
@@ -59,7 +59,7 @@ func NewCommonProtocol(protocol ticket_granting.Interface) *CommonProtocol {
 	protocol.SetHandlerLoginEx(commonProtocol.loginEx)
 	protocol.SetHandlerRequestTicket(commonProtocol.requestTicket)
 
-	commonProtocol.DisableInsecureLogin() // * Disable insecure login by default
+	commonProtocol.DisableInsecureLogin()
 
 	return commonProtocol
 }

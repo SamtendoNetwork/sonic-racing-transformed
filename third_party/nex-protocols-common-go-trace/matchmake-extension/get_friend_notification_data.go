@@ -16,7 +16,7 @@ func (commonProtocol *CommonProtocol) getFriendNotificationData(err error, packe
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
 	}
 
-	// * This method can only receive notifications within the range 101-108, which are reserved for game-specific notifications
+
 	if uiType < 101 || uiType > 108 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
 	}

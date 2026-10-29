@@ -25,8 +25,8 @@ func (commonProtocol *CommonProtocol) replaceURL(err error, packet nex.PacketInt
 
 		if currentStationAddressOk && currentStationPortOk && oldStationAddressOk && oldStationPortOk {
 			if currentStationAddress == oldStationAddress && currentStationPort == oldStationPort {
-				// * This fixes Minecraft, but is obviously incorrect
-				// TODO - What are we really meant to do here?
+
+
 				newStation := url.Copy().(types.StationURL)
 
 				newStation.SetPrincipalID(connection.PID())

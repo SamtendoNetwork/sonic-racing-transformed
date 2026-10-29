@@ -8,7 +8,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// LogUnregisterGathering logs a gathering registration event on the given database
+
 func LogUnregisterGathering(db *sql.DB, sourcePID types.PID, gatheringID uint32) *nex.Error {
 	eventTime := time.Now().UTC()
 

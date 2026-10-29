@@ -10,7 +10,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetPersistentGatheringsByParticipant finds the active persistent gatherings that a user is participating on
+
 func GetPersistentGatheringsByParticipant(manager *common_globals.MatchmakingManager, sourcePID types.PID, participant types.PID, resultRange types.ResultRange) ([]match_making_types.PersistentGathering, *nex.Error) {
 	persistentGatherings := make([]match_making_types.PersistentGathering, 0)
 	rows, err := manager.Database.Query(`SELECT

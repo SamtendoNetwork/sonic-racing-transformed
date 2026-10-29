@@ -11,7 +11,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetMatchmakeSessionByID gets a matchmake session with the given gathering ID and the system password
+
 func GetMatchmakeSessionByID(manager *common_globals.MatchmakingManager, endpoint *nex.PRUDPEndPoint, gatheringID uint32) (match_making_types.MatchmakeSession, string, *nex.Error) {
 	resultMatchmakeSession := match_making_types.NewMatchmakeSession()
 	var startedTime time.Time
@@ -19,7 +19,7 @@ func GetMatchmakeSessionByID(manager *common_globals.MatchmakingManager, endpoin
 	var resultMatchmakeParam []byte
 	var systemPassword string
 
-	// * For simplicity, we will only compare the values that exist on a MatchmakeSessionSearchCriteria
+
 	err := manager.Database.QueryRow(`SELECT
 		g.id,
 		g.owner_pid,

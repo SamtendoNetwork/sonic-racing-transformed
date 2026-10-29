@@ -8,7 +8,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// RetrieveDetailedMessage gets a full message given a message header
+
 func RetrieveDetailedMessage(manager *common_globals.MessagingManager, messageHeader messaging_types.UserMessage, messageType string) (types.DataHolder, *nex.Error) {
 	var messageHolder types.DataHolder
 	var message types.RVType

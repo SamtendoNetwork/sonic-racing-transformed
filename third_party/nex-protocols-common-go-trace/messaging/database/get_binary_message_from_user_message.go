@@ -7,7 +7,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// GetBinaryMessageFromUserMessage gets the binary body for a given user message
+
 func GetBinaryMessageFromUserMessage(manager *common_globals.MessagingManager, messageHeader messaging_types.UserMessage) (messaging_types.BinaryMessage, *nex.Error) {
 	var binaryMessage messaging_types.BinaryMessage
 	var err error

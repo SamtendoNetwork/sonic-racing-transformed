@@ -14,10 +14,10 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// JoinGathering joins participants from the same connection into a gathering. Returns the new number of participants
+
 func JoinGathering(manager *common_globals.MatchmakingManager, gatheringID uint32, connection *nex.PRUDPConnection, vacantParticipants uint16, joinMessage string) (uint32, *nex.Error) {
-	// * vacantParticipants represents the total number of participants that are joining (including the main participant)
-	// * Prevent underflow below if vacantParticipants is set to zero
+
+
 	if vacantParticipants == 0 {
 		vacantParticipants = 1
 	}
@@ -47,14 +47,14 @@ func JoinGathering(manager *common_globals.MatchmakingManager, gatheringID uint3
 
 	var newParticipants []uint64
 
-	// * Additional participants are represented by duplicating the main participant PID on the array
+
 	for range vacantParticipants {
 		newParticipants = append(newParticipants, uint64(connection.PID()))
 	}
 
 	var totalParticipants []uint64 = append(newParticipants, participants...)
 
-	// * We have already checked that the gathering exists above, so we don't have to check the rows affected on sql.Result
+
 	_, err = manager.Database.Exec(`UPDATE matchmaking.gatherings SET participants=$1 WHERE id=$2`, pqextended.Array(totalParticipants), gatheringID)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -71,12 +71,12 @@ func JoinGathering(manager *common_globals.MatchmakingManager, gatheringID uint3
 
 	var participantJoinedTargets []uint64
 
-	// * When the VerboseParticipants or VerboseParticipantsEx flags are set, all participant notification events are sent to everyone
+
 	if flags.HasFlag(match_making_constants.GatheringFlagNotifyParticipationEventsToAllParticipants) || flags.HasFlag(match_making_constants.GatheringFlagNotifyParticipationEventsToAllParticipantsReproducibly) {
 		participantJoinedTargets = common_globals.RemoveDuplicates(totalParticipants)
 	} else {
-		// * If the new participant is the same as the owner, then we are creating a new gathering.
-		// * We don't need to send notification events in that case
+
+
 		if uint64(connection.PID()) == ownerPID {
 			return uint32(len(totalParticipants)), nil
 		}
@@ -94,9 +94,9 @@ func JoinGathering(manager *common_globals.MatchmakingManager, gatheringID uint3
 
 	common_globals.SendNotificationEvent(connection.Endpoint().(*nex.PRUDPEndPoint), oEvent, participantJoinedTargets)
 
-	// * This flag also sends a recap of all currently connected players on the gathering to the participant that is connecting
+
 	if flags.HasFlag(match_making_constants.GatheringFlagNotifyParticipationEventsToAllParticipantsReproducibly) {
-		// TODO - Should this actually be deduplicated?
+
 		for _, participant := range common_globals.RemoveDuplicates(participants) {
 			oEvent := notifications_types.NewNotificationEvent()
 			oEvent.PIDSource = connection.PID()
@@ -106,7 +106,7 @@ func JoinGathering(manager *common_globals.MatchmakingManager, gatheringID uint3
 			oEvent.StrParam = types.NewString(joinMessage)
 			oEvent.Param3 = types.UInt64(len(totalParticipants))
 
-			// * Send the notification to the joining participant
+
 			common_globals.SendNotificationEvent(connection.Endpoint().(*nex.PRUDPEndPoint), oEvent, []uint64{uint64(connection.PID())})
 		}
 	}

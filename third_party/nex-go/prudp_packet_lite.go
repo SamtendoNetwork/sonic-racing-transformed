@@ -11,7 +11,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/constants"
 )
 
-// PRUDPPacketLite represents a PRUDPLite packet
+
 type PRUDPPacketLite struct {
 	PRUDPPacket
 	sourceVirtualPortStreamType      constants.StreamType
@@ -26,49 +26,49 @@ type PRUDPPacketLite struct {
 	liteSignature                    []byte
 }
 
-// SetSourceVirtualPortStreamType sets the packets source VirtualPort StreamType
+
 func (p *PRUDPPacketLite) SetSourceVirtualPortStreamType(streamType constants.StreamType) {
 	p.sourceVirtualPortStreamType = streamType
 }
 
-// SourceVirtualPortStreamType returns the packets source VirtualPort StreamType
+
 func (p *PRUDPPacketLite) SourceVirtualPortStreamType() constants.StreamType {
 	return p.sourceVirtualPortStreamType
 }
 
-// SetSourceVirtualPortStreamID sets the packets source VirtualPort port number
+
 func (p *PRUDPPacketLite) SetSourceVirtualPortStreamID(port uint8) {
 	p.sourceVirtualPortStreamID = port
 }
 
-// SourceVirtualPortStreamID returns the packets source VirtualPort port number
+
 func (p *PRUDPPacketLite) SourceVirtualPortStreamID() uint8 {
 	return p.sourceVirtualPortStreamID
 }
 
-// SetDestinationVirtualPortStreamType sets the packets destination VirtualPort constants.StreamType
+
 func (p *PRUDPPacketLite) SetDestinationVirtualPortStreamType(streamType constants.StreamType) {
 	p.destinationVirtualPortStreamType = streamType
 }
 
-// DestinationVirtualPortStreamType returns the packets destination VirtualPort constants.StreamType
+
 func (p *PRUDPPacketLite) DestinationVirtualPortStreamType() constants.StreamType {
 	return p.destinationVirtualPortStreamType
 }
 
-// SetDestinationVirtualPortStreamID sets the packets destination VirtualPort port number
+
 func (p *PRUDPPacketLite) SetDestinationVirtualPortStreamID(port uint8) {
 	p.destinationVirtualPortStreamID = port
 }
 
-// DestinationVirtualPortStreamID returns the packets destination VirtualPort port number
+
 func (p *PRUDPPacketLite) DestinationVirtualPortStreamID() uint8 {
 	return p.destinationVirtualPortStreamID
 }
 
-// Copy copies the packet into a new PRUDPPacketLite
-//
-// Retains the same PRUDPConnection pointer
+
+
+
 func (p *PRUDPPacketLite) Copy() PRUDPPacketInterface {
 	copied, _ := NewPRUDPPacketLite(p.server, p.sender, nil)
 
@@ -111,12 +111,12 @@ func (p *PRUDPPacketLite) Copy() PRUDPPacketInterface {
 	return copied
 }
 
-// Version returns the packets PRUDP version
+
 func (p *PRUDPPacketLite) Version() int {
 	return 2
 }
 
-// decode parses the packets data
+
 func (p *PRUDPPacketLite) decode() error {
 	magic, err := p.readStream.ReadUInt8()
 	if err != nil {
@@ -187,7 +187,7 @@ func (p *PRUDPPacketLite) decode() error {
 	return nil
 }
 
-// Bytes encodes a PRUDPLite packet into a byte slice
+
 func (p *PRUDPPacketLite) Bytes() []byte {
 	options := p.encodeOptions()
 
@@ -226,7 +226,7 @@ func (p *PRUDPPacketLite) decodeOptions() error {
 			return err
 		}
 
-		optionSize, err := optionsStream.ReadUInt8() // * Options size. We already know the size based on the ID, though
+		optionSize, err := optionsStream.ReadUInt8()
 		if err != nil {
 			return err
 		}
@@ -274,9 +274,9 @@ func (p *PRUDPPacketLite) decodeOptions() error {
 			}
 		}
 
-		// * Only one option is processed at a time, so we can
-		// * just check for errors here rather than after EVERY
-		// * read
+
+
+
 		if err != nil {
 			return err
 		}
@@ -334,11 +334,11 @@ func (p *PRUDPPacketLite) CalculateConnectionSignature(addr net.Addr) ([]byte, e
 }
 
 func (p *PRUDPPacketLite) CalculateSignature(sessionKey, connectionSignature []byte) []byte {
-	// * PRUDPLite has no signature
+
 	return make([]byte, 0)
 }
 
-// NewPRUDPPacketLite creates and returns a new PacketLite using the provided Client and stream
+
 func NewPRUDPPacketLite(server *PRUDPServer, connection *PRUDPConnection, readStream *ByteStreamIn) (*PRUDPPacketLite, error) {
 	packet := &PRUDPPacketLite{
 		PRUDPPacket: PRUDPPacket{
@@ -359,7 +359,7 @@ func NewPRUDPPacketLite(server *PRUDPServer, connection *PRUDPConnection, readSt
 	return packet, nil
 }
 
-// NewPRUDPPacketsLite reads all possible PRUDPLite packets from the stream
+
 func NewPRUDPPacketsLite(server *PRUDPServer, connection *PRUDPConnection, readStream *ByteStreamIn) ([]PRUDPPacketInterface, error) {
 	packets := make([]PRUDPPacketInterface, 0)
 

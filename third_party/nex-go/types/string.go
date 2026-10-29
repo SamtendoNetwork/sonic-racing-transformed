@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-// String is an implementation of rdv::String.
-// Type alias of string
+
+
 type String string
 
-// WriteTo writes the String to the given writable
+
 func (s String) WriteTo(writable Writable) {
 	s = s + "\x00"
 	strLength := len(s)
@@ -25,7 +25,7 @@ func (s String) WriteTo(writable Writable) {
 	writable.Write([]byte(s))
 }
 
-// ExtractFrom extracts the String from the given readable
+
 func (s *String) ExtractFrom(readable Readable) error {
 	var length uint64
 	var err error
@@ -59,12 +59,12 @@ func (s *String) ExtractFrom(readable Readable) error {
 	return nil
 }
 
-// Copy returns a pointer to a copy of the String. Requires type assertion when used
+
 func (s String) Copy() RVType {
 	return NewString(string(s))
 }
 
-// Equals checks if the input is equal in value to the current instance
+
 func (s String) Equals(o RVType) bool {
 	if _, ok := o.(String); !ok {
 		return false
@@ -73,26 +73,26 @@ func (s String) Equals(o RVType) bool {
 	return s == o.(String)
 }
 
-// CopyRef copies the current value of the String
-// and returns a pointer to the new copy
+
+
 func (s String) CopyRef() RVTypePtr {
 	copied := s.Copy().(String)
 	return &copied
 }
 
-// Deref takes a pointer to the String
-// and dereferences it to the raw value.
-// Only useful when working with an instance of RVTypePtr
+
+
+
 func (s *String) Deref() RVType {
 	return *s
 }
 
-// String returns a string representation of the struct
+
 func (s String) String() string {
 	return fmt.Sprintf("%q", string(s))
 }
 
-// Scan implements sql.Scanner for database/sql
+
 func (s *String) Scan(value any) error {
 	if value == nil {
 		*s = String("")
@@ -108,12 +108,12 @@ func (s *String) Scan(value any) error {
 	return nil
 }
 
-// Value implements driver.Valuer for database/sql
+
 func (s String) Value() (driver.Value, error) {
 	return string(s), nil
 }
 
-// NewString returns a new String
+
 func NewString(input string) String {
 	s := String(input)
 	return s

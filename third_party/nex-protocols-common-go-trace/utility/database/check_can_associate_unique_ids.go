@@ -9,7 +9,7 @@ import (
 	utility_types "github.com/PretendoNetwork/nex-protocols-go/v2/utility/types"
 )
 
-// CheckCanAssociateUniqueIDs handles all relevant validity checking (including the existence of a unique ID, if the password matches, etc)
+
 func CheckCanAssociateUniqueIDs(manager *common_globals.UtilityManager, userPID types.PID, uniqueIDInfos types.List[utility_types.UniqueIDInfo]) *nex.Error {
 	var uniqueID, dbPassword types.UInt64
 	var associatedPID types.PID

@@ -77,10 +77,10 @@ func (commonProtocol *CommonProtocol) updateSessionHost(err error, packet nex.Pa
 		oEvent.Param1 = types.UInt64(gid)
 		oEvent.Param2 = types.UInt64(connection.PID())
 
-		// TODO - StrParam doesn't have this value on some servers
-		// * https://github.com/kinnay/NintendoClients/issues/101
-		// * unixTime := time.Now()
-		// * oEvent.StrParam = strconv.FormatInt(unixTime.UnixMicro(), 10)
+
+
+
+
 
 		common_globals.SendNotificationEvent(endpoint, oEvent, common_globals.RemoveDuplicates(participants))
 	}

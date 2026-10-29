@@ -8,7 +8,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// LogParticipateCommunity logs a persistent gathering participation event on the given database
+
 func LogParticipateCommunity(db *sql.DB, sourcePID types.PID, communityGID uint32, gatheringID uint32, participationCount uint32) *nex.Error {
 	eventTime := time.Now().UTC()
 

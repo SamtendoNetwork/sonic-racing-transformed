@@ -7,7 +7,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetSimpleCommunities returns a slice of SimpleCommunity using information from the given gathering IDs
+
 func GetSimpleCommunities(manager *common_globals.MatchmakingManager, gatheringIDList []uint32) ([]match_making_types.SimpleCommunity, *nex.Error) {
 	simpleCommunities := make([]match_making_types.SimpleCommunity, 0)
 

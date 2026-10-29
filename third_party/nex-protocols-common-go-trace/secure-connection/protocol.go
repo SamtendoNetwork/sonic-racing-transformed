@@ -21,25 +21,25 @@ type CommonProtocol struct {
 	OnAfterSendReport           func(packet nex.PacketInterface, reportID types.UInt32, reportData types.QBuffer)
 }
 
-// DisableInsecureRegister disables the insecure Register method
+
 func (commonProtocol *CommonProtocol) DisableInsecureRegister() {
 	commonProtocol.allowInsecureRegisterMethod = false
 }
 
-// EnableInsecureRegister enables the insecure Register method. Do not enable this on NEX 1 games
+
 func (commonProtocol *CommonProtocol) EnableInsecureRegister() {
 	common_globals.Logger.Warning("Insecure Register has been enabled. This MUST NOT be enabled on NEX 1 games or with EnableInsecureLogin at the same time except on friends. Use with caution!")
 	commonProtocol.allowInsecureRegisterMethod = true
 }
 
-// ConfigurePNValidation configures the servers game server IDs for use in validating NEX login data
+
 func (commonProtocol *CommonProtocol) ConfigurePNValidation(gameServerIDs []string) {
 	commonProtocol.ValidateLoginData = func(pid types.PID, loginData types.DataHolder) *nex.Error {
 		return common_globals.ValidatePNLoginData(pid, loginData, gameServerIDs)
 	}
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol secure_connection.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint: protocol.Endpoint(),

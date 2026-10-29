@@ -9,9 +9,9 @@ import (
 	utility_types "github.com/PretendoNetwork/nex-protocols-go/v2/utility/types"
 )
 
-// UpdateUniqueIDAssociations updates the associations for a unique ID in the database based on the given user's PID (this does not
-// check if the user should be able to associate the unique ID, see CheckCanAssociateUniqueIDs)
-// isPrimary is used to indicate if the 0th unique ID in the array should be set as a primary ID (in most cases, this should be true)
+
+
+
 func UpdateUniqueIDAssociations(manager *common_globals.UtilityManager, userPID types.PID, uniqueIDInfos types.List[utility_types.UniqueIDInfo], isPrimary bool) *nex.Error {
 	var err error
 

@@ -2,9 +2,9 @@ package nex
 
 import "net"
 
-// TODO - We can also breakout the decoding/encoding functions here too, but that would require getters and setters for all packet fields
 
-// PRUDPV0Settings defines settings for how to handle aspects of PRUDPv0 packets
+
+
 type PRUDPV0Settings struct {
 	IsQuazalMode                  bool
 	EncryptedConnect              bool
@@ -16,7 +16,7 @@ type PRUDPV0Settings struct {
 	ChecksumCalculator            func(packet *PRUDPPacketV0, data []byte) uint32
 }
 
-// NewPRUDPV0Settings returns a new PRUDPV0Settings
+
 func NewPRUDPV0Settings() *PRUDPV0Settings {
 	return &PRUDPV0Settings{
 		IsQuazalMode:                  false,

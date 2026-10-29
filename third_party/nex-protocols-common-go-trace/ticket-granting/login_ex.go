@@ -27,7 +27,7 @@ func (commonProtocol *CommonProtocol) loginEx(err error, packet nex.PacketInterf
 	sourceAccount, errorCode := endpoint.AccountDetailsByUsername(string(strUserName))
 
 	if errorCode == nil {
-		// * The connection doesn't have a PID set here, so we use the source PID
+
 		errorCode = commonProtocol.ValidateLoginData(sourceAccount.PID, oExtraData)
 	}
 
@@ -53,7 +53,7 @@ func (commonProtocol *CommonProtocol) loginEx(err error, packet nex.PacketInterf
 	strReturnMsg := types.NewString("")
 	pSourceKey := types.NewString("")
 
-	// * If any errors are triggered, return them in %retval%
+
 	if errorCode != nil {
 		common_globals.Logger.Error(errorCode.Message)
 		retval = types.NewQResultError(errorCode.ResultCode)

@@ -9,7 +9,7 @@ import (
 	"fmt"
 )
 
-// HPPPacket holds all the data about an HPP request
+
 type HPPPacket struct {
 	sender             *HPPClient
 	accessKeySignature []byte
@@ -19,17 +19,17 @@ type HPPPacket struct {
 	processed          chan bool
 }
 
-// Sender returns the Client who sent the packet
+
 func (p *HPPPacket) Sender() ConnectionInterface {
 	return p.sender
 }
 
-// Payload returns the packets payload
+
 func (p *HPPPacket) Payload() []byte {
 	return p.payload
 }
 
-// SetPayload sets the packets payload
+
 func (p *HPPPacket) SetPayload(payload []byte) {
 	p.payload = payload
 }
@@ -121,17 +121,17 @@ func (p *HPPPacket) calculateSignature(buffer []byte, key []byte) ([]byte, error
 	return hmac, nil
 }
 
-// RMCMessage returns the packets RMC Message
+
 func (p *HPPPacket) RMCMessage() *RMCMessage {
 	return p.message
 }
 
-// SetRMCMessage sets the packets RMC Message
+
 func (p *HPPPacket) SetRMCMessage(message *RMCMessage) {
 	p.message = message
 }
 
-// NewHPPPacket creates and returns a new HPPPacket using the provided Client and payload
+
 func NewHPPPacket(client *HPPClient, payload []byte) (*HPPPacket, error) {
 	hppPacket := &HPPPacket{
 		sender:    client,

@@ -8,7 +8,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// DeleteAllMessages deletes all messages for the given recipient
+
 func DeleteAllMessages(manager *common_globals.MessagingManager, recipientID types.UInt64, recipientType messaging_constants.RecipientType) (types.UInt32, *nex.Error) {
 	var err error
 

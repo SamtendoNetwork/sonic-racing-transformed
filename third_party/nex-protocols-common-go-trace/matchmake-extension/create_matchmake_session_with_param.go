@@ -30,7 +30,7 @@ func (commonProtocol *CommonProtocol) createMatchmakeSessionWithParam(err error,
 	commonProtocol.manager.Mutex.Lock()
 
 	if createMatchmakeSessionParam.GIDForParticipationCheck != 0 {
-		// * Check that all new participants are participating in the specified gathering ID
+
 		nexError := database.CheckGatheringForParticipation(commonProtocol.manager, uint32(createMatchmakeSessionParam.GIDForParticipationCheck), append(createMatchmakeSessionParam.AdditionalParticipants, connection.PID()))
 		if nexError != nil {
 			commonProtocol.manager.Mutex.Unlock()
@@ -38,8 +38,8 @@ func (commonProtocol *CommonProtocol) createMatchmakeSessionWithParam(err error,
 		}
 	}
 
-	// * A client may disconnect from a session without leaving reliably,
-	// * so let's make sure the client is removed from all sessions
+
+
 	database.EndMatchmakeSessionsParticipation(commonProtocol.manager, connection)
 
 	joinedMatchmakeSession := createMatchmakeSessionParam.SourceMatchmakeSession.Copy().(match_making_types.MatchmakeSession)

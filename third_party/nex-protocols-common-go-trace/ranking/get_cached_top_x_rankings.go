@@ -21,7 +21,7 @@ func (commonProtocol *CommonProtocol) getCachedTopXRankings(err error, packet ne
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, "change_error")
 	}
 
-	// TODO - Is this true?
+
 	if len(categories) != len(orderParams) {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, "change_error")
 	}
@@ -32,7 +32,7 @@ func (commonProtocol *CommonProtocol) getCachedTopXRankings(err error, packet ne
 	pResult := types.NewList[ranking_types.RankingCachedResult]()
 
 	for i, category := range categories {
-		// * We already checked that categories and orderParams have the same length
+
 		orderParam := orderParams[i]
 
 		rankDataList, totalCount, err := commonProtocol.GetRankingsAndCountByCategoryAndRankingOrderParam(category, orderParam)
@@ -49,16 +49,16 @@ func (commonProtocol *CommonProtocol) getCachedTopXRankings(err error, packet ne
 
 		result.RankingResult.RankDataList = rankDataList
 		result.RankingResult.TotalCount = types.NewUInt32(totalCount)
-		result.RankingResult.SinceTime = types.NewDateTime(0x1F40420000) // * 2000-01-01T00:00:00.000Z, this is what the real server sends back
+		result.RankingResult.SinceTime = types.NewDateTime(0x1F40420000)
 
 		result.CreatedTime = types.NewDateTime(0).Now()
-		// * The real server sends the "CreatedTime" + 5 minutes.
-		// * It doesn't change, even on subsequent requests, until after the
-		// * ExpiredTime has passed (seemingly what the "cached" means).
-		// * Whether we need to replicate this idk, but in case, here's a note.
+
+
+
+
 		result.ExpiredTime.FromTimestamp(time.Now().UTC().Add(time.Minute * time.Duration(5)))
-		// * This is the length Ultimate NES Remix uses
-		// TODO - Does this matter? and are other games different?
+
+
 		result.MaxLength = types.NewUInt8(10)
 
 		pResult = append(pResult, result)

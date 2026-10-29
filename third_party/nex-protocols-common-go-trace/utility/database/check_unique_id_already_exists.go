@@ -10,7 +10,7 @@ import (
 	utility_types "github.com/PretendoNetwork/nex-protocols-go/v2/utility/types"
 )
 
-// CheckUniqueIDAlreadyExists takes a UniqueIDInfo and returns an error if the unique ID is already present in the database
+
 func CheckUniqueIDAlreadyExists(manager *common_globals.UtilityManager, uniqueIDInfo utility_types.UniqueIDInfo) *nex.Error {
 	var uniqueID types.UInt64
 

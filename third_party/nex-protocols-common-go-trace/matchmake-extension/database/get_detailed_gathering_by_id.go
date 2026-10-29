@@ -7,7 +7,7 @@ import (
 	match_making_database "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making/database"
 )
 
-// GetDetailedGatheringByID returns a Gathering as an RVType by its gathering ID
+
 func GetDetailedGatheringByID(manager *common_globals.MatchmakingManager, sourcePID uint64, gatheringID uint32) (types.RVType, string, *nex.Error) {
 	gathering, gatheringType, participants, startedTime, nexError := match_making_database.FindGatheringByID(manager, gatheringID)
 	if nexError != nil {
@@ -24,7 +24,7 @@ func GetDetailedGatheringByID(manager *common_globals.MatchmakingManager, source
 			return nil, "", nexError
 		}
 
-		// * Scrap session key and user password
+
 		matchmakeSession.SessionKey = make([]byte, 0)
 		matchmakeSession.UserPassword = ""
 
@@ -37,7 +37,7 @@ func GetDetailedGatheringByID(manager *common_globals.MatchmakingManager, source
 			return nil, "", nexError
 		}
 
-		// * Scrap persistent gathering password
+
 		persistentGathering.Password = ""
 
 		return persistentGathering, gatheringType, nil

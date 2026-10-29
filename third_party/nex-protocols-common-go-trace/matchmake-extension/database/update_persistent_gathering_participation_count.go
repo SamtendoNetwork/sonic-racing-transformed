@@ -6,7 +6,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// UpdatePersistentGatheringParticipationCount updates the participation count of a user in a persistent gathering. Returns the participation count
+
 func UpdatePersistentGatheringParticipationCount(manager *common_globals.MatchmakingManager, userPID types.PID, gatheringID uint32) (uint32, *nex.Error) {
 	var participationCount uint32
 	err := manager.Database.QueryRow(`INSERT INTO matchmaking.community_participations AS cp (

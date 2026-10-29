@@ -31,7 +31,7 @@ func (commonProtocol *CommonProtocol) findOfficialCommunity(err error, packet ne
 	lstCommunity := types.NewList[match_making_types.PersistentGathering]()
 
 	for i := range communities {
-		// * Scrap persistent gathering password
+
 		communities[i].Password = ""
 	}
 

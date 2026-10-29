@@ -8,12 +8,12 @@ import (
 )
 
 func (commonProtocol *CommonProtocol) postMetaBinary(err error, packet nex.PacketInterface, callID uint32, param datastore_types.DataStorePreparePostParam) (*nex.RMCMessage, *nex.Error) {
-	// * This method looks to function identically to DataStore::PreparePostObject,
-	// * except the only difference being it doesn't return an S3 upload URL. This
-	// * needs to be verified though, as there are other methods in the family such
-	// * as DataStore::PostMetaBinaryWithDataID which make less sense in this context,
-	// * unless those are just used to *update* a meta binary? Or maybe the DataID in
-	// * those methods is a pre-allocated DataID from the server? Needs more testing
+
+
+
+
+
+
 
 	if commonProtocol.InitializeObjectByPreparePostParam == nil {
 		common_globals.Logger.Warning("InitializeObjectByPreparePostParam not defined")
@@ -33,14 +33,14 @@ func (commonProtocol *CommonProtocol) postMetaBinary(err error, packet nex.Packe
 	connection := packet.Sender()
 	endpoint := connection.Endpoint()
 
-	// TODO - Need to verify what param.PersistenceInitParam.DeleteLastObject really means. It's often set to true even when it wouldn't make sense
+
 	dataID, errCode := commonProtocol.InitializeObjectByPreparePostParam(connection.PID(), param)
 	if errCode != nil {
 		common_globals.Logger.Errorf("Error code on object init: %s", errCode.Error())
 		return nil, errCode
 	}
 
-	// TODO - Should this be moved to InitializeObjectByPreparePostParam?
+
 	for _ , ratingInitParamWithSlot := range param.RatingInitParams {
 		errCode = commonProtocol.InitializeObjectRatingWithSlot(dataID, ratingInitParamWithSlot)
 		if errCode != nil {

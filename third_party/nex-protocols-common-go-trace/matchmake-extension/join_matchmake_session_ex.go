@@ -31,13 +31,13 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionEx(err error, packet n
 		return nil, nexError
 	}
 
-	// TODO - Is this the correct error code?
+
 	if joinedMatchmakeSession.UserPasswordEnabled || joinedMatchmakeSession.SystemPasswordEnabled {
 		commonProtocol.manager.Mutex.Unlock()
 		return nil, nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "change_error")
 	}
 
-	// * Allow game servers to do their own permissions checks
+
 	if commonProtocol.CanJoinMatchmakeSession != nil {
 		nexError = commonProtocol.CanJoinMatchmakeSession(commonProtocol.manager, connection.PID(), joinedMatchmakeSession)
 	} else {

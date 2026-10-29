@@ -23,13 +23,13 @@ func (commonProtocol *CommonProtocol) searchObject(err error, packet nex.PacketI
 	connection := packet.Sender()
 	endpoint := connection.Endpoint()
 
-	// * This is likely game-specific. Also developer note:
-	// * Please keep in mind that no results is allowed. errCode
-	// * should NEVER be DataStore::NotFound!
-	// *
-	// * DataStoreSearchParam contains a ResultRange to limit the
-	// * returned results. TotalCount is the total matching objects
-	// * in the database, whereas objects is the limited results
+
+
+
+
+
+
+
 	objects, totalCount, errCode := commonProtocol.GetObjectInfosByDataStoreSearchParam(param, connection.PID())
 	if errCode != nil {
 		return nil, errCode
@@ -42,9 +42,9 @@ func (commonProtocol *CommonProtocol) searchObject(err error, packet nex.PacketI
 	for _, object := range objects {
 		errCode = commonProtocol.VerifyObjectPermission(object.OwnerID, connection.PID(), object.Permission)
 		if errCode != nil {
-			// * Since we don't error here, should we also
-			// * "hide" these results by also decrementing
-			// * totalCount?
+
+
+
 			continue
 		}
 
@@ -55,20 +55,20 @@ func (commonProtocol *CommonProtocol) searchObject(err error, packet nex.PacketI
 
 	var totalCountType constants.SearchResultTotalCountType
 
-	// * Doing this here since the object
-	// * the permissions checks in the
-	// * previous loop will mutate the data
-	// * returned from the database
+
+
+
+
 	if totalCount == uint32(len(pSearchResult.Result)) {
-		totalCountType = constants.SearchResultTotalExact // * Has no more data. All possible results were returned
+		totalCountType = constants.SearchResultTotalExact
 	} else {
-		totalCountType = constants.SearchResultTotalMinimum // * Has more data. Not all possible results were returned
+		totalCountType = constants.SearchResultTotalMinimum
 	}
 
-	// * Disables the TotalCount
-	// *
-	// * Only seen in struct revision 3 or
-	// * NEX 4.0+
+
+
+
+
 	if param.StructureVersion >= 3 || endpoint.LibraryVersions().DataStore.GreaterOrEqual("4.0.0") {
 		if !param.TotalCountEnabled {
 			totalCount = 0

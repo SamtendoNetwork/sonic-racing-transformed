@@ -21,7 +21,7 @@ func (commonProtocol *CommonProtocol) retrieveMessages(err error, packet nex.Pac
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "lstMsgIDs must not be empty")
 	}
 
-	// * Only allow up to 100 messages
+
 	if len(lstMsgIDs) > 100 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "Trying to query over 100 messages")
 	}
@@ -37,7 +37,7 @@ func (commonProtocol *CommonProtocol) retrieveMessages(err error, packet nex.Pac
 
 	recipientID, recipientType := common_globals.GetMessageRecipientData(libraryVersion, recipient)
 
-	// * If the MessageRecipient is invalid, just return no entries
+
 	if valid := commonProtocol.manager.ValidateMessageRecipient(commonProtocol.manager, connection.PID(), recipientID, recipientType); valid {
 		lstMessages, nexError = messaging_database.RetrieveMessages(commonProtocol.manager, recipientID, recipientType, lstMsgIDs, bLeaveOnServer)
 		if nexError != nil {

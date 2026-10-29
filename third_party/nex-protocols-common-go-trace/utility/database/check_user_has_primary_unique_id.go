@@ -8,7 +8,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// CheckUserHasPrimaryUniqueID checks if a given user already has a primary unique ID, and returns the result, as well as the ID if applicable
+
 func CheckUserHasPrimaryUniqueID(manager *common_globals.UtilityManager, userPID types.PID) (bool, types.UInt64, *nex.Error) {
 	primaryExists := true
 	var primaryID types.UInt64

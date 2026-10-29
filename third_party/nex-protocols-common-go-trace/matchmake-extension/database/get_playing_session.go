@@ -7,15 +7,15 @@ import (
 	match_making_types "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 )
 
-// GetPlayingSession returns the playing sessions of the given PIDs
+
 func GetPlayingSession(manager *common_globals.MatchmakingManager, listPID types.List[types.PID]) (types.List[match_making_types.PlayingSession], *nex.Error) {
-	playingSessions := make([]match_making_types.PlayingSession, 0, 1000) // * Allocate for a capacity of up to MAX_MATCHMAKE_SESSION_BY_PARTICIPANT entries
+	playingSessions := make([]match_making_types.PlayingSession, 0, 1000)
 	for _, pid := range listPID {
-		if len(playingSessions) >= 1000 { // * MAX_MATCHMAKE_SESSION_BY_PARTICIPANT
+		if len(playingSessions) >= 1000 {
 			break
 		}
 
-		// TODO - Handle user blocks when implemented
+
 		rows, err := manager.Database.Query(`SELECT
 			g.id,
 			g.owner_pid,
@@ -53,7 +53,7 @@ func GetPlayingSession(manager *common_globals.MatchmakingManager, listPID types
 		}
 
 		for rows.Next() {
-			if len(playingSessions) >= 1000 { // * MAX_MATCHMAKE_SESSION_BY_PARTICIPANT
+			if len(playingSessions) >= 1000 {
 				break
 			}
 

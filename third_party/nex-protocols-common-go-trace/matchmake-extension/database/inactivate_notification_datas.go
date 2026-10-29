@@ -6,7 +6,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// InactivateNotificationDatas marks the notifications of a given user as inactive
+
 func InactivateNotificationDatas(manager *common_globals.MatchmakingManager, sourcePID types.PID) *nex.Error {
 	_, err := manager.Database.Exec(`UPDATE matchmaking.notifications SET active=false WHERE source_pid=$1`, sourcePID)
 	if err != nil {

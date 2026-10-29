@@ -1,6 +1,6 @@
 package nex
 
-// EndpointInterface defines all the methods an endpoint should have regardless of type
+
 type EndpointInterface interface {
 	AccessKey() string
 	SetAccessKey(accessKey string)
@@ -8,7 +8,7 @@ type EndpointInterface interface {
 	LibraryVersions() *LibraryVersions
 	ByteStreamSettings() *ByteStreamSettings
 	SetByteStreamSettings(settings *ByteStreamSettings)
-	UseVerboseRMC() bool // TODO - Move this to a RMCSettings struct?
+	UseVerboseRMC() bool
 	EnableVerboseRMC(enabled bool)
 	EmitError(err *Error)
 }

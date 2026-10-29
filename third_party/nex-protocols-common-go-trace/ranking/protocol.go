@@ -27,7 +27,7 @@ type CommonProtocol struct {
 	OnAfterUploadScore                                             func(packet nex.PacketInterface, scoreData ranking_types.RankingScoreData, uniqueID types.UInt64)
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol ranking.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint: protocol.Endpoint(),

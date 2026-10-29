@@ -15,7 +15,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// FindMatchmakeSessionBySearchCriteria finds matchmake sessions with the given search criterias
+
 func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, searchCriterias []match_making_types.MatchmakeSessionSearchCriteria, resultRange types.ResultRange, sourceMatchmakeSession *match_making_types.MatchmakeSession, isAutoMatchmake bool) ([]match_making_types.MatchmakeSession, *nex.Error) {
 	resultMatchmakeSessions := make([]match_making_types.MatchmakeSession, 0)
 
@@ -31,7 +31,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 	}
 
 	for _, searchCriteria := range searchCriterias {
-		// * If doing auto-matchmake, only allow sessions where the user is able to join
+
 		if isAutoMatchmake {
 			searchCriteria.VacantOnly = true
 			searchCriteria.ExcludeLocked = true
@@ -83,7 +83,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 
 		var valid bool = true
 		for i, attrib := range searchCriteria.Attribs {
-			// * Ignore attribute 1 here, reserved for the selection method
+
 			if i == 1 {
 				continue
 			}
@@ -116,7 +116,7 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 		}
 
-		// * Search criteria is invalid, continue to next one
+
 		if !valid {
 			continue
 		}
@@ -217,9 +217,9 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 			}
 		}
 
-		// * Filter full sessions if necessary
+
 		if searchCriteria.VacantOnly {
-			// * Account for the VacantParticipants when searching for sessions (if given)
+
 			if searchCriteria.VacantParticipants == 0 {
 				searchStatement += ` AND array_length(g.participants, 1) + 1 <= g.max_participants`
 			} else {
@@ -229,10 +229,10 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 
 		switch searchCriteria.SelectionMethod {
 		case constants.MatchmakeSelectionMethodRandom:
-			// * Random global
+
 			searchStatement += ` ORDER BY RANDOM()`
 		case constants.MatchmakeSelectionMethodNearestNeighbor:
-			// * Closest attribute
+
 			attribute1, err := strconv.ParseUint(string(searchCriteria.Attribs[1]), 10, 32)
 			if err != nil {
 				common_globals.Logger.Error(err.Error())
@@ -241,9 +241,9 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 
 			searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.attribs[2])`, attribute1)
 		case constants.MatchmakeSelectionMethodBroadenRange:
-			// * Ranked
 
-			// TODO - Actually implement ranked matchmaking, using closest attribute at the moment
+
+
 			attribute1, err := strconv.ParseUint(string(searchCriteria.Attribs[1]), 10, 32)
 			if err != nil {
 				common_globals.Logger.Error(err.Error())
@@ -252,20 +252,20 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 
 			searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.attribs[2])`, attribute1)
 		case constants.MatchmakeSelectionMethodProgressScore:
-			// * Progress Score
 
-			// * We can only use this when doing auto-matchmake
+
+
 			if sourceMatchmakeSession == nil {
 				continue
 			}
 
 			searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.progress_score)`, sourceMatchmakeSession.ProgressScore)
 		case constants.MatchmakeSelectionMethodBroadenRangeWithProgressScore:
-			// * Ranked + Progress
 
-			// TODO - Actually implement ranked matchmaking, using closest attribute at the moment
 
-			// * We can only use this when doing auto-matchmake
+
+
+
 			if sourceMatchmakeSession == nil {
 				continue
 			}
@@ -277,20 +277,20 @@ func FindMatchmakeSessionBySearchCriteria(manager *common_globals.MatchmakingMan
 					continue
 				}
 
-				// TODO - Should the attribute and the progress score actually weigh the same?
+
 				searchStatement += fmt.Sprintf(` ORDER BY abs(%d - ms.attribs[2] + %d - ms.progress_score)`, attribute1, sourceMatchmakeSession.ProgressScore)
 			}
 
-			// case constants.SelectionMethodScoreBased: // * According to notes this is related with the MatchmakeParam. TODO - Implement this
+
 		}
 
-		// * If the ResultRange inside the MatchmakeSessionSearchCriteria is valid (only present on NEX 4.0+), use that
-		// * Otherwise, use the one given as argument
+
+
 		if searchCriteria.ResultRange.Length != 0 {
 			searchStatement += fmt.Sprintf(` LIMIT %d OFFSET %d`, uint32(searchCriteria.ResultRange.Length), uint32(searchCriteria.ResultRange.Offset))
 		} else {
-			// * Since we use one ResultRange for all searches, limit the total length to the one specified
-			// * but apply the same offset to all queries
+
+
 			searchStatement += fmt.Sprintf(` LIMIT %d OFFSET %d`, uint32(resultRange.Length)-uint32(len(resultMatchmakeSessions)), uint32(resultRange.Offset))
 		}
 

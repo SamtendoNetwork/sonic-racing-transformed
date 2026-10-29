@@ -9,7 +9,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// LogDisconnectGathering logs a gathering disconnect event on the given database
+
 func LogDisconnectGathering(db *sql.DB, pid types.PID, gatheringID uint32, totalParticipants []uint64) *nex.Error {
 	eventTime := time.Now().UTC()
 

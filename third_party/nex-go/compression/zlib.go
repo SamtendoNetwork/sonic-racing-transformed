@@ -6,10 +6,10 @@ import (
 	"fmt"
 )
 
-// Zlib implements packet payload compression using zlib
+
 type Zlib struct{}
 
-// Compress compresses the payload using zlib
+
 func (z *Zlib) Compress(payload []byte) ([]byte, error) {
 	compressed := bytes.Buffer{}
 
@@ -38,13 +38,13 @@ func (z *Zlib) Compress(payload []byte) ([]byte, error) {
 	return result, nil
 }
 
-// Decompress decompresses the payload using zlib
+
 func (z *Zlib) Decompress(payload []byte) ([]byte, error) {
 	compressionRatio := payload[0]
 	compressed := payload[1:]
 
 	if compressionRatio == 0 {
-		// * Compression ratio of 0 means no compression
+
 		return compressed, nil
 	}
 
@@ -77,12 +77,12 @@ func (z *Zlib) Decompress(payload []byte) ([]byte, error) {
 	return decompressedBytes, nil
 }
 
-// Copy returns a copy of the algorithm
+
 func (z *Zlib) Copy() Algorithm {
 	return NewZlibCompression()
 }
 
-// NewZlibCompression returns a new instance of the Zlib compression
+
 func NewZlibCompression() *Zlib {
 	return &Zlib{}
 }

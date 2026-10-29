@@ -9,7 +9,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// LogLeaveGathering logs a gathering leave event on the given database
+
 func LogLeaveGathering(db *sql.DB, pid types.PID, gatheringID uint32, totalParticipants []uint64) *nex.Error {
 	eventTime := time.Now().UTC()
 

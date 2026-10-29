@@ -12,7 +12,7 @@ import (
 	notificationstypes "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/types"
 )
 
-// maxMessageLength is the cap NEX places on join/leave messages.
+
 const maxMessageLength = 256
 
 func (p *Protocol) registerMatchmakeExtension(protocol *matchmakeextension.Protocol) {
@@ -40,14 +40,14 @@ func (p *Protocol) registerMatchmakeExtension(protocol *matchmakeextension.Proto
 	protocol.SetHandlerFindMatchmakeSessionByOwner(p.findMatchmakeSessionByOwner)
 }
 
-// * ---------------------------------------------------------------------------
-// * Session creation and joining
-// * ---------------------------------------------------------------------------
 
-// createMatchmakeSession registers a new lobby with the caller as owner, host
-// and first participant. It is what happens when a player hosts a race.
-//
-// Response: gid (UInt32), sessionKey (Buffer, since NEX 3.0.0).
+
+
+
+
+
+
+
 func (p *Protocol) createMatchmakeSession(err error, packet nex.PacketInterface, callID uint32, anyGathering matchmakingtypes.GatheringHolder, message types.String, participationCount types.UInt16) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -70,9 +70,9 @@ func (p *Protocol) createMatchmakeSession(err error, packet nex.PacketInterface,
 
 	p.Store.Lock()
 
-	// * A console can drop out of a lobby without telling us. Clear any stale
-	// * membership first, otherwise the player would appear to be in two
-	// * sessions at once.
+
+
+
 	p.Store.RemoveConnectionLocked(uint64(connection.PID()), notificationsconstants.ParticipationEventsDisconnect)
 
 	session := p.Store.CreateLocked(connection, requested)
@@ -99,15 +99,15 @@ func (p *Protocol) createMatchmakeSession(err error, packet nex.PacketInterface,
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodCreateMatchmakeSession, callID, stream.Bytes()), nil
 }
 
-// joinMatchmakeSession joins an existing lobby by gathering ID.
-//
-// Response: sessionKey (Buffer, since NEX 3.0.0).
+
+
+
 func (p *Protocol) joinMatchmakeSession(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, strMessage types.String) (*nex.RMCMessage, *nex.Error) {
 	return p.join(err, packet, callID, gid, strMessage, 1, matchmakeextension.MethodJoinMatchmakeSession)
 }
 
-// joinMatchmakeSessionEx is joinMatchmakeSession with a participant count, used
-// when a console brings extra local players into the lobby.
+
+
 func (p *Protocol) joinMatchmakeSessionEx(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, strMessage types.String, dontCareMyBlockList types.Bool, participationCount types.UInt16) (*nex.RMCMessage, *nex.Error) {
 	return p.join(err, packet, callID, gid, strMessage, uint16(participationCount), matchmakeextension.MethodJoinMatchmakeSessionEx)
 }
@@ -161,16 +161,16 @@ func (p *Protocol) join(err error, packet nex.PacketInterface, callID uint32, gi
 	return respond(endpoint, matchmakeextension.ProtocolID, methodID, callID, stream.Bytes()), nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Automatic matchmaking
-// * ---------------------------------------------------------------------------
 
-// autoMatchmakePostpone is the "find me a race" path: look for a session
-// matching the one the client describes, join it if found, otherwise create it.
-// The "Postpone" suffix means the session is not started immediately - the
-// client waits for more players.
-//
-// Response: the resulting session as a GatheringHolder.
+
+
+
+
+
+
+
+
+
 func (p *Protocol) autoMatchmakePostpone(err error, packet nex.PacketInterface, callID uint32, anyGathering matchmakingtypes.GatheringHolder, message types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -185,8 +185,8 @@ func (p *Protocol) autoMatchmakePostpone(err error, packet nex.PacketInterface, 
 		return nil, nexError
 	}
 
-	// * No search criteria are sent with this call. The session the client
-	// * describes IS the search: Store.FindSession matches it field for field.
+
+
 	return p.autoMatchmake(
 		packet,
 		callID,
@@ -197,9 +197,9 @@ func (p *Protocol) autoMatchmakePostpone(err error, packet nex.PacketInterface, 
 	)
 }
 
-// autoMatchmakeWithSearchCriteriaPostpone is autoMatchmakePostpone where the
-// client supplies its own list of search criteria, tried in order. Games use
-// the ordering to widen the search: strict criteria first, looser ones after.
+
+
+
 func (p *Protocol) autoMatchmakeWithSearchCriteriaPostpone(err error, packet nex.PacketInterface, callID uint32, lstSearchCriteria types.List[matchmakingtypes.MatchmakeSessionSearchCriteria], anyGathering matchmakingtypes.GatheringHolder, strMessage types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -240,22 +240,22 @@ func (p *Protocol) autoMatchmake(
 
 	p.Store.Lock()
 
-	// * Drop any stale membership before matchmaking, otherwise the search
-	// * could hand the player back the session they are already in.
+
+
 	p.Store.RemoveConnectionLocked(uint64(connection.PID()), notificationsconstants.ParticipationEventsDisconnect)
 
 	var session *Session
 
 	if len(searchCriterias) == 0 {
-		// * Plain AutoMatchmake: match the described session field for field.
+
 		if candidate := p.Store.FindSession(connection, requested, p.AllowPublicMatchmaking); candidate != nil {
 			if p.Store.CanJoin(connection.PID(), candidate) == nil {
 				session = candidate
 			}
 		}
 	} else {
-		// * AutoMatchmakeWithSearchCriteria: the criteria are tried in order,
-		// * so take the first joinable result. Only one is ever needed.
+
+
 		resultRange := types.NewResultRange()
 		resultRange.Offset = types.NewUInt32(0)
 		resultRange.Length = types.NewUInt32(1)
@@ -276,7 +276,7 @@ func (p *Protocol) autoMatchmake(
 
 	created := false
 	if session == nil {
-		// * Nothing to join, so this player becomes the host and waits.
+
 		session = p.Store.CreateLocked(connection, requested)
 		created = true
 	}
@@ -308,21 +308,21 @@ func (p *Protocol) autoMatchmake(
 	return respond(endpoint, matchmakeextension.ProtocolID, methodID, callID, stream.Bytes()), nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Session discovery
-// * ---------------------------------------------------------------------------
 
-// browseMatchmakeSession returns the lobbies matching a search.
-//
-// Response: List<GatheringHolder>.
+
+
+
+
+
+
 func (p *Protocol) browseMatchmakeSession(err error, packet nex.PacketInterface, callID uint32, searchCriteria matchmakingtypes.MatchmakeSessionSearchCriteria, resultRange types.ResultRange) (*nex.RMCMessage, *nex.Error) {
 	return p.browse(err, packet, callID, searchCriteria, resultRange, matchmakeextension.MethodBrowseMatchmakeSession)
 }
 
-// browseMatchmakeSessionWithHostURLs has the same response shape here as the
-// plain variant. The station URLs a client needs for peer to peer setup are
-// fetched separately through MatchMakingExt::GetParticipantsURLs once it has
-// actually joined, so there is nothing extra to attach at browse time.
+
+
+
+
 func (p *Protocol) browseMatchmakeSessionWithHostURLs(err error, packet nex.PacketInterface, callID uint32, searchCriteria matchmakingtypes.MatchmakeSessionSearchCriteria, resultRange types.ResultRange) (*nex.RMCMessage, *nex.Error) {
 	return p.browse(err, packet, callID, searchCriteria, resultRange, matchmakeextension.MethodBrowseMatchmakeSessionWithHostURLs)
 }
@@ -357,16 +357,16 @@ func (p *Protocol) browse(err error, packet nex.PacketInterface, callID uint32, 
 	return respond(endpoint, matchmakeextension.ProtocolID, methodID, callID, stream.Bytes()), nil
 }
 
-// * The FindMatchmakeSessionBy* family returns MatchmakeSessions directly
-// * rather than wrapped in a GatheringHolder - they are the "no holder"
-// * variants, which is precisely what distinguishes them from BrowseMatchmake-
-// * Session. They are also NEX 4.x-era methods that a 3.0.1 title will never
-// * call, but they are cheap to support correctly and useful for tooling.
 
-// findMatchmakeSessionByGatheringID looks up sessions by ID directly, bypassing
-// the search filters. This is the friend/invite path.
-//
-// Response: List<MatchmakeSession>.
+
+
+
+
+
+
+
+
+
 func (p *Protocol) findMatchmakeSessionByGatheringID(err error, packet nex.PacketInterface, callID uint32, lstGID types.List[types.UInt32]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -391,10 +391,10 @@ func (p *Protocol) findMatchmakeSessionByGatheringID(err error, packet nex.Packe
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodFindMatchmakeSessionByGatheringID, callID, stream.Bytes()), nil
 }
 
-// findMatchmakeSessionBySingleGatheringID looks up one session by ID.
-//
-// Response: MatchmakeSession. There is no "found" flag - a missing gathering
-// is reported as an error rather than an empty result.
+
+
+
+
 func (p *Protocol) findMatchmakeSessionBySingleGatheringID(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -418,9 +418,9 @@ func (p *Protocol) findMatchmakeSessionBySingleGatheringID(err error, packet nex
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodFindMatchmakeSessionBySingleGatheringID, callID, stream.Bytes()), nil
 }
 
-// findMatchmakeSessionByOwner returns the sessions a given player owns.
-//
-// Response: List<MatchmakeSession>.
+
+
+
 func (p *Protocol) findMatchmakeSessionByOwner(err error, packet nex.PacketInterface, callID uint32, id types.UInt32, resultRange types.ResultRange) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -443,15 +443,15 @@ func (p *Protocol) findMatchmakeSessionByOwner(err error, packet nex.PacketInter
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodFindMatchmakeSessionByOwner, callID, stream.Bytes()), nil
 }
 
-// getPlayingSession reports which session each of the given players is in.
-//
-// Response: List<PlayingSession>.
+
+
+
 func (p *Protocol) getPlayingSession(err error, packet nex.PacketInterface, callID uint32, lstPID types.List[types.PID]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
 	}
 
-	// * MAX_PRINCIPALID_SIZE_TO_FIND_MATCHMAKE_SESSION
+
 	if len(lstPID) > 300 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "lstPID exceeds MAX_PRINCIPALID_SIZE_TO_FIND_MATCHMAKE_SESSION")
 	}
@@ -479,10 +479,10 @@ func (p *Protocol) getPlayingSession(err error, packet nex.PacketInterface, call
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodGetPlayingSession, callID, stream.Bytes()), nil
 }
 
-// getSimplePlayingSession is getPlayingSession trimmed to the fields a friends
-// list needs.
-//
-// Response: List<SimplePlayingSession>.
+
+
+
+
 func (p *Protocol) getSimplePlayingSession(err error, packet nex.PacketInterface, callID uint32, listPID types.List[types.PID], includeLoginUser types.Bool) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -523,12 +523,12 @@ func (p *Protocol) getSimplePlayingSession(err error, packet nex.PacketInterface
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodGetSimplePlayingSession, callID, stream.Bytes()), nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Session mutation - owner only
-// * ---------------------------------------------------------------------------
 
-// ownedSession fetches a session and verifies the caller owns it. The caller
-// must hold the write lock.
+
+
+
+
+
 func (p *Protocol) ownedSession(connection *nex.PRUDPConnection, gid uint32) (*Session, *nex.Error) {
 	session, nexError := p.Store.GetLocked(gid)
 	if nexError != nil {
@@ -542,7 +542,7 @@ func (p *Protocol) ownedSession(connection *nex.PRUDPConnection, gid uint32) (*S
 	return session, nil
 }
 
-// mutateOwned runs a mutation against a session the caller owns.
+
 func (p *Protocol) mutateOwned(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, methodID uint32, mutate func(session *Session) *nex.Error) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -570,8 +570,8 @@ func (p *Protocol) mutateOwned(err error, packet nex.PacketInterface, callID uin
 	return respondEmpty(endpoint, matchmakeextension.ProtocolID, methodID, callID), nil
 }
 
-// closeParticipation stops new players joining. The host calls this when the
-// race is about to start.
+
+
 func (p *Protocol) closeParticipation(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	return p.mutateOwned(err, packet, callID, gid, matchmakeextension.MethodCloseParticipation, func(session *Session) *nex.Error {
 		session.MatchmakeSession.OpenParticipation = types.NewBool(false)
@@ -579,7 +579,7 @@ func (p *Protocol) closeParticipation(err error, packet nex.PacketInterface, cal
 	})
 }
 
-// openParticipation reopens a lobby, typically after a race finishes.
+
 func (p *Protocol) openParticipation(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	return p.mutateOwned(err, packet, callID, gid, matchmakeextension.MethodOpenParticipation, func(session *Session) *nex.Error {
 		session.MatchmakeSession.OpenParticipation = types.NewBool(true)
@@ -587,8 +587,8 @@ func (p *Protocol) openParticipation(err error, packet nex.PacketInterface, call
 	})
 }
 
-// updateApplicationBuffer replaces the game-defined blob attached to a session.
-// For a racer this typically carries track, lap count and rule settings.
+
+
 func (p *Protocol) updateApplicationBuffer(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, applicationBuffer types.Buffer) (*nex.RMCMessage, *nex.Error) {
 	if len(applicationBuffer) > 512 {
 		return nil, invalidArgument(nil)
@@ -600,8 +600,8 @@ func (p *Protocol) updateApplicationBuffer(err error, packet nex.PacketInterface
 	})
 }
 
-// updateProgressScore updates how far along the session is, used by the
-// progress-score selection method to match players into races already running.
+
+
 func (p *Protocol) updateProgressScore(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, progressScore types.UInt8) (*nex.RMCMessage, *nex.Error) {
 	if progressScore > 100 {
 		return nil, invalidArgument(nil)
@@ -613,7 +613,7 @@ func (p *Protocol) updateProgressScore(err error, packet nex.PacketInterface, ca
 	})
 }
 
-// updateMatchmakeSessionAttribute replaces the whole attribute list.
+
 func (p *Protocol) updateMatchmakeSessionAttribute(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, attribs types.List[types.UInt32]) (*nex.RMCMessage, *nex.Error) {
 	return p.mutateOwned(err, packet, callID, gid, matchmakeextension.MethodUpdateMatchmakeSessionAttribute, func(session *Session) *nex.Error {
 		if len(attribs) != len(session.MatchmakeSession.Attributes) {
@@ -625,7 +625,7 @@ func (p *Protocol) updateMatchmakeSessionAttribute(err error, packet nex.PacketI
 	})
 }
 
-// modifyCurrentGameAttribute changes a single attribute by index.
+
 func (p *Protocol) modifyCurrentGameAttribute(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, attribIndex types.UInt32, newValue types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	return p.mutateOwned(err, packet, callID, gid, matchmakeextension.MethodModifyCurrentGameAttribute, func(session *Session) *nex.Error {
 		if int(attribIndex) >= len(session.MatchmakeSession.Attributes) {
@@ -637,11 +637,11 @@ func (p *Protocol) modifyCurrentGameAttribute(err error, packet nex.PacketInterf
 	})
 }
 
-// updateMatchmakeSession replaces the mutable parts of a session wholesale.
-//
-// Identity and membership are deliberately preserved: the gathering ID, owner,
-// host, session key and participant list all stay as they were, because this
-// call is the host editing lobby settings, not re-creating the lobby.
+
+
+
+
+
 func (p *Protocol) updateMatchmakeSession(err error, packet nex.PacketInterface, callID uint32, anyGathering matchmakingtypes.GatheringHolder) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -682,12 +682,12 @@ func (p *Protocol) updateMatchmakeSession(err error, packet nex.PacketInterface,
 	return respondEmpty(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodUpdateMatchmakeSession, callID), nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Notification data
-// * ---------------------------------------------------------------------------
 
-// updateNotificationData publishes a game-defined status a player's friends can
-// read back. Types 101-108 are the range reserved for games.
+
+
+
+
+
 func (p *Protocol) updateNotificationData(err error, packet nex.PacketInterface, callID uint32, uiType notificationsconstants.NotificationCategory, uiParam1 types.UInt64, uiParam2 types.UInt64, strParam types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -712,8 +712,8 @@ func (p *Protocol) updateNotificationData(err error, packet nex.PacketInterface,
 
 	p.Store.SetNotificationData(uint64(connection.PID()), event)
 
-	// * Push straight to any friends who happen to be online, so their lobby
-	// * lists update without polling.
+
+
 	if p.Store.GetUserFriendPIDs != nil {
 		var targets []uint64
 		for _, friend := range p.Store.GetUserFriendPIDs(uint32(connection.PID())) {
@@ -730,10 +730,10 @@ func (p *Protocol) updateNotificationData(err error, packet nex.PacketInterface,
 	return respondEmpty(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodUpdateNotificationData, callID), nil
 }
 
-// getFriendNotificationData reads back one category of friends' notification
-// data.
-//
-// Response: List<NotificationEvent>.
+
+
+
+
 func (p *Protocol) getFriendNotificationData(err error, packet nex.PacketInterface, callID uint32, uiType notificationsconstants.NotificationCategorySigned) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -753,9 +753,9 @@ func (p *Protocol) getFriendNotificationData(err error, packet nex.PacketInterfa
 	return respond(endpoint, matchmakeextension.ProtocolID, matchmakeextension.MethodGetFriendNotificationData, callID, stream.Bytes()), nil
 }
 
-// getLstFriendNotificationData reads back several categories at once.
-//
-// Response: List<NotificationEvent>.
+
+
+
 func (p *Protocol) getLstFriendNotificationData(err error, packet nex.PacketInterface, callID uint32, lstTypes types.List[notificationsconstants.NotificationCategory]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)

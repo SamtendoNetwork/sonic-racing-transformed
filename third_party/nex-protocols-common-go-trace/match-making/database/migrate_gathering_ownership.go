@@ -10,7 +10,7 @@ import (
 	notifications_types "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/types"
 )
 
-// MigrateGatheringOwnership switches the owner of the gathering with a different one
+
 func MigrateGatheringOwnership(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, gathering match_making_types.Gathering, participants []uint64) (uint64, *nex.Error) {
 	var nexError *nex.Error
 	var uniqueParticipants []uint64 = common_globals.RemoveDuplicates(participants)
@@ -22,7 +22,7 @@ func MigrateGatheringOwnership(manager *common_globals.MatchmakingManager, conne
 		}
 	}
 
-	// * We couldn't find a new owner, so we unregister the gathering
+
 	if newOwner == 0 {
 		nexError = UnregisterGathering(manager, connection.PID(), uint32(gathering.ID))
 		if nexError != nil {
@@ -40,7 +40,7 @@ func MigrateGatheringOwnership(manager *common_globals.MatchmakingManager, conne
 
 	oldOwner := gathering.OwnerPID.Copy().(types.PID)
 
-	// * Set the new owner
+
 	gathering.OwnerPID = types.NewPID(newOwner)
 
 	nexError = UpdateSessionHost(manager, uint32(gathering.ID), gathering.OwnerPID, gathering.HostPID)
@@ -59,10 +59,10 @@ func MigrateGatheringOwnership(manager *common_globals.MatchmakingManager, conne
 	oEvent.Param1 = types.UInt64(gathering.ID)
 	oEvent.Param2 = types.UInt64(newOwner)
 
-	// TODO - StrParam doesn't have this value on some servers
-	// * https://github.com/kinnay/NintendoClients/issues/101
-	// * unixTime := time.Now()
-	// * oEvent.StrParam = strconv.FormatInt(unixTime.UnixMicro(), 10)
+
+
+
+
 
 	common_globals.SendNotificationEvent(connection.Endpoint().(*nex.PRUDPEndPoint), oEvent, uniqueParticipants)
 	return newOwner, nil

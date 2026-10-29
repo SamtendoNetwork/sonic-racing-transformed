@@ -5,12 +5,12 @@ import (
 	"fmt"
 )
 
-// Structure represents a Quazal Rendez-Vous/NEX Structure (custom class) base struct.
+
 type Structure struct {
 	StructureVersion uint8 `json:"structure_version" db:"structure_version" bson:"structure_version" xml:"StructureVersion"`
 }
 
-// ExtractHeaderFrom extracts the structure header from the given readable
+
 func (s *Structure) ExtractHeaderFrom(readable Readable) error {
 	if readable.UseStructureHeader() {
 		version, err := readable.ReadUInt8()
@@ -33,7 +33,7 @@ func (s *Structure) ExtractHeaderFrom(readable Readable) error {
 	return nil
 }
 
-// WriteHeaderTo writes the structure header to the given writable
+
 func (s Structure) WriteHeaderTo(writable Writable, contentLength uint32) {
 	if writable.UseStructureHeader() {
 		writable.WriteUInt8(s.StructureVersion)

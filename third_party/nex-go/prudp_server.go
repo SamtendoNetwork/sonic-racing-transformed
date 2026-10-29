@@ -18,9 +18,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// EnableBasicUDPHealthCheck enables a basic UDP echo server
-// on the given port, used to check if the server is reachable
-// at all
+
+
+
 func EnableBasicUDPHealthCheck(port int) {
 	udpAddress, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", port))
 	if err != nil {
@@ -46,7 +46,7 @@ func EnableBasicUDPHealthCheck(port int) {
 	}
 }
 
-// PRUDPServer represents a bare-bones PRUDP server
+
 type PRUDPServer struct {
 	udpSocket                     *net.UDPConn
 	websocketServer               *WebSocketServer
@@ -64,9 +64,9 @@ type PRUDPServer struct {
 	UseVerboseRMC                 bool
 }
 
-// EnableMetrics enables the net/http/pprof server at the specified address.
-// This exposes standard pprof profiles (CPU, heap, goroutine, etc.) at /debug/pprof/
-// and custom metrics at /debug/vars. Also enables a prometheus exporter at /metrics
+
+
+
 func (ps *PRUDPServer) EnableMetrics(addr string) {
 	endpointConnections := promauto.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -122,7 +122,7 @@ func (ps *PRUDPServer) EnableMetrics(addr string) {
 	}()
 }
 
-// BindPRUDPEndPoint binds a provided PRUDPEndPoint to the server
+
 func (ps *PRUDPServer) BindPRUDPEndPoint(endpoint *PRUDPEndPoint) {
 	if ps.Endpoints.Has(endpoint.StreamID) {
 		logger.Warningf("Tried to bind already existing PRUDPEndPoint %d", endpoint.StreamID)
@@ -133,12 +133,12 @@ func (ps *PRUDPServer) BindPRUDPEndPoint(endpoint *PRUDPEndPoint) {
 	ps.Endpoints.Set(endpoint.StreamID, endpoint)
 }
 
-// Listen is an alias of ListenUDP. Implemented to conform to the EndpointInterface
+
 func (ps *PRUDPServer) Listen(port int) {
 	ps.ListenUDP(port)
 }
 
-// ListenUDP starts a PRUDP server on a given port using a UDP server
+
 func (ps *PRUDPServer) ListenUDP(port int) {
 	ps.initPRUDPv1ConnectionSignatureKey()
 
@@ -185,7 +185,7 @@ func (ps *PRUDPServer) listenDatagram(quit chan struct{}) {
 	panic(err)
 }
 
-// ListenWebSocket starts a PRUDP server on a given port using a WebSocket server
+
 func (ps *PRUDPServer) ListenWebSocket(port int) {
 	ps.initPRUDPv1ConnectionSignatureKey()
 
@@ -196,7 +196,7 @@ func (ps *PRUDPServer) ListenWebSocket(port int) {
 	ps.websocketServer.listen(port)
 }
 
-// ListenWebSocketSecure starts a PRUDP server on a given port using a secure (TLS) WebSocket server
+
 func (ps *PRUDPServer) ListenWebSocketSecure(port int, certFile, keyFile string) {
 	ps.initPRUDPv1ConnectionSignatureKey()
 
@@ -208,7 +208,7 @@ func (ps *PRUDPServer) ListenWebSocketSecure(port int, certFile, keyFile string)
 }
 
 func (ps *PRUDPServer) initPRUDPv1ConnectionSignatureKey() {
-	// * Ensure the server has a key for PRUDPv1 connection signatures
+
 	if len(ps.PRUDPv1ConnectionSignatureKey) != 16 {
 		ps.PRUDPv1ConnectionSignatureKey = make([]byte, 16)
 		_, err := rand.Read(ps.PRUDPv1ConnectionSignatureKey)
@@ -219,7 +219,7 @@ func (ps *PRUDPServer) initPRUDPv1ConnectionSignatureKey() {
 }
 
 func (ps *PRUDPServer) handleSocketMessage(packetData []byte, address net.Addr, webSocketConnection *gws.Conn) error {
-	// * Check that the message is long enough for initial parsing
+
 	if len(packetData) < 2 {
 		return nil
 	}
@@ -228,10 +228,10 @@ func (ps *PRUDPServer) handleSocketMessage(packetData []byte, address net.Addr, 
 
 	var packets []PRUDPPacketInterface
 
-	// * Support any packet type the client sends and respond
-	// * with that same type. Also keep reading from the stream
-	// * until no more data is left, to account for multiple
-	// * packets being sent at once
+
+
+
+
 	if ps.websocketServer != nil && packetData[0] == 0x80 {
 		packets, _ = NewPRUDPPacketsLite(ps, nil, readStream)
 	} else if bytes.Equal(packetData[:2], []byte{0xEA, 0xD0}) {
@@ -277,8 +277,8 @@ func (ps *PRUDPServer) processPacket(packet PRUDPPacketInterface, address net.Ad
 	sourcePortNumber := packet.SourceVirtualPortStreamID()
 	invalidSourcePort := false
 
-	// * PRUDPLite packets can use port numbers 0-31
-	// * PRUDPv0 and PRUDPv1 can use port numbers 0-15
+
+
 	if _, ok := packet.(*PRUDPPacketLite); ok {
 		if sourcePortNumber > 31 {
 			invalidSourcePort = true
@@ -296,7 +296,7 @@ func (ps *PRUDPServer) processPacket(packet PRUDPPacketInterface, address net.Ad
 	endpoint.processPacket(packet, socket)
 }
 
-// Send sends the packet to the packets sender
+
 func (ps *PRUDPServer) Send(packet PacketInterface) {
 	if packet, ok := packet.(PRUDPPacketInterface); ok {
 		data := packet.Payload()
@@ -317,10 +317,10 @@ func (ps *PRUDPServer) Send(packet PacketInterface) {
 
 			ps.sendPacket(packet)
 
-			// * This delay is here to prevent the server from overloading the client with too many packets.
-			// * The 16ms (1/60th of a second) value is chosen based on testing with the friends server and is a good balance between
-			// * Not being too slow and also not dropping any packets because we've overloaded the client. This may be because it
-			// * roughly matches the framerate that most games target (60fps)
+
+
+
+
 			if i < fragments {
 				time.Sleep(16 * time.Millisecond)
 			}
@@ -329,10 +329,10 @@ func (ps *PRUDPServer) Send(packet PacketInterface) {
 }
 
 func (ps *PRUDPServer) sendPacket(packet PRUDPPacketInterface) {
-	// * PRUDPServer.Send will send fragments as the same packet,
-	// * just with different fields. In order to prevent modifying
-	// * multiple packets at once, due to the same pointer being
-	// * reused, we must make a copy of the packet being sent
+
+
+
+
 	packetCopy := packet.Copy()
 	connection := packetCopy.Sender().(*PRUDPConnection)
 
@@ -371,7 +371,7 @@ func (ps *PRUDPServer) sendPacket(packet PRUDPPacketInterface) {
 				packetCopy.SetPayload(encryptedPayload)
 			}
 		} else {
-			// * PRUDPLite does not encrypt payloads, since they go over WSS
+
 			if packetCopy.Version() != 2 {
 				packetCopy.SetPayload(packetCopy.processUnreliableCrypto())
 			}
@@ -395,9 +395,9 @@ func (ps *PRUDPServer) sendPacket(packet PRUDPPacketInterface) {
 	ps.SendRaw(packetCopy.Sender().(*PRUDPConnection).Socket, packetCopy.Bytes())
 }
 
-// SendRaw will send the given socket the provided packet
+
 func (ps *PRUDPServer) SendRaw(socket *SocketConnection, data []byte) {
-	// TODO - Should this return the error too?
+
 
 	var err error
 
@@ -412,23 +412,23 @@ func (ps *PRUDPServer) SendRaw(socket *SocketConnection, data []byte) {
 	}
 }
 
-// SetFragmentSize sets the max size for a packets payload
+
 func (ps *PRUDPServer) SetFragmentSize(fragmentSize int) {
-	// TODO - Derive this value from the MTU
-	// * From the wiki:
-	// *
-	// * The fragment size depends on the implementation.
-	// * It is generally set to the MTU minus the packet overhead.
-	// *
-	// * In old NEX versions, which only support PRUDP v0, the MTU is
-	// * hardcoded to 1000 and the maximum payload size seems to be 962 bytes.
-	// *
-	// * Later, the MTU was increased to 1364, and the maximum payload
-	// * size is seems to be 1300 bytes, unless PRUDP v0 is used, in which case it’s 1264 bytes.
+
+
+
+
+
+
+
+
+
+
+
 	ps.FragmentSize = fragmentSize
 }
 
-// NewPRUDPServer will return a new PRUDP server
+
 func NewPRUDPServer() *PRUDPServer {
 	return &PRUDPServer{
 		Endpoints:          NewMutexMap[uint8, *PRUDPEndPoint](),

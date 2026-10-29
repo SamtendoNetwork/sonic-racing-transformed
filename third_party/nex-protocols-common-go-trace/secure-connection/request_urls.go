@@ -17,7 +17,7 @@ func (commonProtocol *CommonProtocol) requestURLs(err error, packet nex.PacketIn
 	connection := packet.Sender().(*nex.PRUDPConnection)
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 
-	// TODO - Is this correct?
+
 	requestedConnection := endpoint.FindConnectionByID(uint32(cidTarget))
 	if requestedConnection == nil {
 		requestedConnection = endpoint.FindConnectionByPID(uint64(pidTarget))

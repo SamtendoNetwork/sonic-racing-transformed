@@ -9,18 +9,18 @@ import (
 
 var errorMask = 1 << 31
 
-// QResult is an implementation of rdv::qResult.
-// Type alias of uint32.
-// Determines the result of an operation.
-// If the MSB is set the result is an error, otherwise success
+
+
+
+
 type QResult uint32
 
-// WriteTo writes the QResult to the given writable
+
 func (r QResult) WriteTo(writable Writable) {
 	writable.WriteUInt32LE(uint32(r))
 }
 
-// ExtractFrom extracts the QResult from the given readable
+
 func (r *QResult) ExtractFrom(readable Readable) error {
 	code, err := readable.ReadUInt32LE()
 	if err != nil {
@@ -31,12 +31,12 @@ func (r *QResult) ExtractFrom(readable Readable) error {
 	return nil
 }
 
-// Copy returns a pointer to a copy of the QResult. Requires type assertion when used
+
 func (r QResult) Copy() RVType {
 	return NewQResult(uint32(r))
 }
 
-// Equals checks if the input is equal in value to the current instance
+
 func (r QResult) Equals(o RVType) bool {
 	if _, ok := o.(QResult); !ok {
 		return false
@@ -45,36 +45,36 @@ func (r QResult) Equals(o RVType) bool {
 	return r == o.(QResult)
 }
 
-// CopyRef copies the current value of the QResult
-// and returns a pointer to the new copy
+
+
 func (r QResult) CopyRef() RVTypePtr {
 	copied := r.Copy().(QResult)
 	return &copied
 }
 
-// Deref takes a pointer to the QResult
-// and dereferences it to the raw value.
-// Only useful when working with an instance of RVTypePtr
+
+
+
 func (r *QResult) Deref() RVType {
 	return *r
 }
 
-// IsSuccess returns true if the QResult is a success
+
 func (r QResult) IsSuccess() bool {
 	return int(r)&errorMask == 0
 }
 
-// IsError returns true if the QResult is a error
+
 func (r QResult) IsError() bool {
 	return int(r)&errorMask != 0
 }
 
-// String returns a string representation of the struct
+
 func (r QResult) String() string {
 	return r.FormatToString(0)
 }
 
-// FormatToString pretty-prints the struct data using the provided indentation level
+
 func (r QResult) FormatToString(indentationLevel int) string {
 	indentationValues := strings.Repeat("\t", indentationLevel+1)
 	indentationEnd := strings.Repeat("\t", indentationLevel)
@@ -94,7 +94,7 @@ func (r QResult) FormatToString(indentationLevel int) string {
 	return b.String()
 }
 
-// Scan implements sql.Scanner for database/sql
+
 func (r *QResult) Scan(value any) error {
 	if value == nil {
 		*r = QResult(0)
@@ -117,23 +117,23 @@ func (r *QResult) Scan(value any) error {
 	return nil
 }
 
-// Value implements driver.Valuer for database/sql
+
 func (r QResult) Value() (driver.Value, error) {
 	return int64(r), nil
 }
 
-// NewQResult returns a new QResult
+
 func NewQResult(input uint32) QResult {
 	r := QResult(input)
 	return r
 }
 
-// NewQResultSuccess returns a new QResult set as a success
+
 func NewQResultSuccess(code uint32) QResult {
 	return NewQResult(uint32(int(code) & ^errorMask))
 }
 
-// NewQResultError returns a new QResult set as an error
+
 func NewQResultError(code uint32) QResult {
 	return NewQResult(uint32(int(code) | errorMask))
 }

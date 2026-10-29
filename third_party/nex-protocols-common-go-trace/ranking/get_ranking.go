@@ -18,7 +18,7 @@ func (commonProtocol *CommonProtocol) getRanking(err error, packet nex.PacketInt
 	connection := packet.Sender()
 	endpoint := connection.Endpoint()
 	callerPID := principalID
-	// * 0 = "own ranking"
+
 	if callerPID == 0 {
 		callerPID = connection.PID()
 	}
@@ -80,7 +80,7 @@ func (commonProtocol *CommonProtocol) getRanking(err error, packet nex.PacketInt
 
 	pResult.RankDataList = rankDataList
 	pResult.TotalCount = types.NewUInt32(totalCount)
-	pResult.SinceTime = types.NewDateTime(0x1F40420000) // * 2000-01-01T00:00:00.000Z, this is what the real server sends back
+	pResult.SinceTime = types.NewDateTime(0x1F40420000)
 
 	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 

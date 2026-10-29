@@ -19,13 +19,13 @@ func (commonProtocol *CommonProtocol) updateNotificationData(err error, packet n
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
 	}
 
-	// * This method can only send notifications within the range 101-108, which are reserved for game-specific notifications
+
 	if uiType < 101 || uiType > 108 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
 	}
 
-	// * All strings must have a length lower than 256.
-	// * Kid Icarus: Uprising sends strings with UTF-8 bytes longer than 256, so I assume this should count the runes instead
+
+
 	if utf8.RuneCountInString(string(strParam)) > 256 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
 	}
@@ -56,7 +56,7 @@ func (commonProtocol *CommonProtocol) updateNotificationData(err error, packet n
 
 	commonProtocol.manager.Mutex.Unlock()
 
-	// * If the friends are connected, try to send the notifications directly aswell. This is observed on Mario Tennis Open
+
 	var friendList []uint32
 	if commonProtocol.manager.GetUserFriendPIDs != nil {
 		friendList = commonProtocol.manager.GetUserFriendPIDs(uint32(connection.PID()))
@@ -65,7 +65,7 @@ func (commonProtocol *CommonProtocol) updateNotificationData(err error, packet n
 	if len(friendList) != 0 {
 		var targets []uint64
 		for _, pid := range friendList {
-			// * Only send the notification to friends who are connected
+
 			if endpoint.FindConnectionByPID(uint64(pid)) != nil {
 				targets = append(targets, uint64(pid))
 			}

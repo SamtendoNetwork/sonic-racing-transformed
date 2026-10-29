@@ -11,7 +11,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// FindMatchmakeSession finds a matchmake session with the given search matchmake session
+
 func FindMatchmakeSession(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, searchMatchmakeSession match_making_types.MatchmakeSession) (*match_making_types.MatchmakeSession, *nex.Error) {
 	attribs := make([]uint32, len(searchMatchmakeSession.Attributes))
 	for i, value := range searchMatchmakeSession.Attributes {
@@ -67,10 +67,10 @@ func FindMatchmakeSession(manager *common_globals.MatchmakingManager, connection
 		ms.attribs[6]=$9 AND
 		ms.matchmake_system_type=$10 AND
 		ms.codeword=$11 AND (CASE WHEN g.participation_policy=98 THEN g.owner_pid=ANY($12) ELSE true END)
-		ORDER BY abs($5 - ms.attribs[2])` // * Use "Closest attribute" selection method, guessing from Mario Kart 7
+		ORDER BY abs($5 - ms.attribs[2])`
 
 	var friendList []uint32
-	// * Prevent access to friend rooms if not implemented
+
 	if manager.GetUserFriendPIDs != nil {
 		friendList = manager.GetUserFriendPIDs(uint32(connection.PID()))
 	}
@@ -80,7 +80,7 @@ func FindMatchmakeSession(manager *common_globals.MatchmakingManager, connection
 	var resultAttribs []uint32
 	var resultMatchmakeParam []byte
 
-	// * For simplicity, we will only compare the values that exist on a MatchmakeSessionSearchCriteria
+
 	err := manager.Database.QueryRow(searchStatement,
 		searchMatchmakeSession.Gathering.MaximumParticipants,
 		searchMatchmakeSession.Gathering.MinimumParticipants,

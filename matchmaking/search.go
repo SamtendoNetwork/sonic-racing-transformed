@@ -13,25 +13,25 @@ import (
 	matchmakingtypes "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 )
 
-// * A MatchmakeSessionSearchCriteria expresses every numeric constraint as a
-// * string, which is either:
-// *
-// *   ""        no constraint
-// *   "5"       exactly 5
-// *   "1,10"    between 1 and 10 inclusive
-// *
-// * This mirrors how common-go turns the criteria into SQL; the semantics below
-// * are a direct port of matchmake-extension/database/find_matchmake_session_by_search_criteria.go.
 
-// rangeConstraint is a parsed numeric criterion.
+
+
+
+
+
+
+
+
+
+
 type rangeConstraint struct {
 	min uint64
 	max uint64
 }
 
-// parseConstraint parses one criteria string. It returns ok=false if the string
-// is malformed, which makes the whole criteria unusable, and present=false if
-// the string is empty, meaning "no constraint".
+
+
+
 func parseConstraint(value string) (constraint rangeConstraint, present bool, ok bool) {
 	if value == "" {
 		return rangeConstraint{}, false, true
@@ -60,24 +60,24 @@ func (r rangeConstraint) contains(value uint64) bool {
 	return value >= r.min && value <= r.max
 }
 
-// SearchOptions tunes a search beyond what the criteria itself expresses.
+
 type SearchOptions struct {
-	// AutoMatchmake forces the restrictive filters on, so the automatic
-	// matchmaker can only ever land a player in a session they can join.
+
+
 	AutoMatchmake bool
 
-	// ExcludeOwnerPID drops sessions owned by this PID. Used so a player
-	// searching for a game never matches their own stale session.
+
+
 	ExcludeOwnerPID uint64
 
-	// AllowPublic gates whether sessions are discoverable at all.
+
 	AllowPublic bool
 }
 
-// Search returns the sessions matching any of the given criteria, ordered by
-// the criteria's selection method and limited by resultRange.
-//
-// The caller must hold at least the read lock.
+
+
+
+
 func (s *Store) Search(
 	connection *nex.PRUDPConnection,
 	searchCriterias []matchmakingtypes.MatchmakeSessionSearchCriteria,
@@ -115,14 +115,14 @@ func (s *Store) Search(
 
 		matched, ok := s.matchCriteria(connection, criteria, friendList, options)
 		if !ok {
-			// * A malformed criteria is skipped rather than failing the call,
-			// * matching common-go.
+
+
 			continue
 		}
 
 		sortSessions(matched, criteria, sourceSession)
 
-		// * Apply the shared offset to every criteria, and cap the total.
+
 		if offset >= uint32(len(matched)) {
 			continue
 		}
@@ -144,21 +144,21 @@ func (s *Store) Search(
 	return results
 }
 
-// matchCriteria filters every live session against one criteria.
+
 func (s *Store) matchCriteria(
 	connection *nex.PRUDPConnection,
 	criteria matchmakingtypes.MatchmakeSessionSearchCriteria,
 	friendList []uint32,
 	options SearchOptions,
 ) ([]*Session, bool) {
-	// * Pre-parse every constraint once. A malformed one invalidates the whole
-	// * criteria.
+
+
 	attributeConstraints := make([]rangeConstraint, len(criteria.Attribs))
 	attributePresent := make([]bool, len(criteria.Attribs))
 
 	for i, attribute := range criteria.Attribs {
-		// * Index 1 is reserved for the selection method's parameter and is
-		// * never a filter.
+
+
 		if i == 1 {
 			continue
 		}
@@ -206,8 +206,8 @@ func (s *Store) matchCriteria(
 			continue
 		}
 
-		// * The attribute list must be the same shape, otherwise the indices
-		// * mean different things.
+
+
 		if len(candidate.Attributes) != len(criteria.Attribs) {
 			continue
 		}
@@ -244,7 +244,7 @@ func (s *Store) matchCriteria(
 			continue
 		}
 
-		// * ParticipationPolicy 98 means friends-of-the-owner only.
+
 		if candidate.ParticipationPolicy == 98 && !slices.Contains(friendList, uint32(candidate.OwnerPID)) {
 			continue
 		}
@@ -270,7 +270,7 @@ func (s *Store) matchCriteria(
 	return matched, true
 }
 
-// sortSessions orders results according to the criteria's selection method.
+
 func sortSessions(sessions []*Session, criteria matchmakingtypes.MatchmakeSessionSearchCriteria, sourceSession *matchmakingtypes.MatchmakeSession) {
 	distanceTo := func(target uint64, value uint64) uint64 {
 		if value > target {
@@ -280,7 +280,7 @@ func sortSessions(sessions []*Session, criteria matchmakingtypes.MatchmakeSessio
 		return target - value
 	}
 
-	// * attribute 1 carries the selection method's reference value.
+
 	referenceAttribute := uint64(0)
 	if len(criteria.Attribs) > 1 {
 		if parsed, err := strconv.ParseUint(string(criteria.Attribs[1]), 10, 32); err == nil {
@@ -328,29 +328,29 @@ func sortSessions(sessions []*Session, criteria matchmakingtypes.MatchmakeSessio
 		})
 
 	default:
-		// * MatchmakeSelectionMethodRandom and anything unrecognised: fullest
-		// * session first, so lobbies fill up instead of fragmenting. This is
-		// * a deliberate improvement over common-go's ORDER BY RANDOM() - a
-		// * small player base matches far more reliably when it converges.
+
+
+
+
 		sort.SliceStable(sessions, func(a, b int) bool {
 			return sessions[a].ParticipationCount() > sessions[b].ParticipationCount()
 		})
 	}
 }
 
-// FindSession implements the match used by the plain AutoMatchmake_Postpone,
-// which does not send search criteria at all - the client describes the session
-// it wants and the server finds an equivalent one.
-//
-// This is a direct port of common-go's FindMatchmakeSession query. The fields
-// compared for equality are max/min participants, game mode, matchmake system
-// type and attributes 0 and 2-5. Attribute 1 is deliberately excluded from the
-// match and used to order the results instead: whichever open session has the
-// closest attribute 1 wins. (common-go notes this ordering was inferred from
-// Mario Kart 7, and it is the same "closest attribute" behaviour the explicit
-// NearestNeighbor selection method uses.)
-//
-// The caller must hold at least the read lock.
+
+
+
+
+
+
+
+
+
+
+
+
+
 func (s *Store) FindSession(connection *nex.PRUDPConnection, search matchmakingtypes.MatchmakeSession, allowPublic bool) *Session {
 	if !allowPublic {
 		return nil
@@ -361,15 +361,15 @@ func (s *Store) FindSession(connection *nex.PRUDPConnection, search matchmakingt
 		friendList = s.GetUserFriendPIDs(uint32(connection.PID()))
 	}
 
-	// * Attributes must line up index for index, so a differently shaped list
-	// * can never match.
+
+
 	matchedAttributes := func(candidate matchmakingtypes.MatchmakeSession) bool {
 		if len(candidate.Attributes) != len(search.Attributes) {
 			return false
 		}
 
 		for i := range search.Attributes {
-			// * Index 1 is the ordering key, not a filter.
+
 			if i == 1 {
 				continue
 			}
@@ -460,7 +460,7 @@ func (s *Store) FindSession(connection *nex.PRUDPConnection, search matchmakingt
 	return candidates[0]
 }
 
-// CanJoin reports whether a PID is permitted to join a session.
+
 func (s *Store) CanJoin(pid types.PID, session *Session) *nex.Error {
 	matchmakeSession := session.MatchmakeSession
 

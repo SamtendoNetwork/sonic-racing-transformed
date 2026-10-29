@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// RVConnectionData is an implementation of rdv::RVConnectionData.
-// Contains the locations and data of Rendez-Vous connection.
+
+
 type RVConnectionData struct {
 	Structure
 	StationURL                 StationURL  `json:"station_url" db:"station_url" bson:"station_url" xml:"StationURL"`
@@ -15,7 +15,7 @@ type RVConnectionData struct {
 	Time                       DateTime    `json:"time" db:"time" bson:"time" xml:"Time"`
 }
 
-// WriteTo writes the RVConnectionData to the given writable
+
 func (rvcd RVConnectionData) WriteTo(writable Writable) {
 	contentWritable := writable.CopyNew()
 
@@ -34,7 +34,7 @@ func (rvcd RVConnectionData) WriteTo(writable Writable) {
 	writable.Write(content)
 }
 
-// ExtractFrom extracts the RVConnectionData from the given readable
+
 func (rvcd *RVConnectionData) ExtractFrom(readable Readable) error {
 	var err error
 	if err = rvcd.ExtractHeaderFrom(readable); err != nil {
@@ -66,7 +66,7 @@ func (rvcd *RVConnectionData) ExtractFrom(readable Readable) error {
 	return nil
 }
 
-// Copy returns a new copied instance of RVConnectionData
+
 func (rvcd RVConnectionData) Copy() RVType {
 	copied := NewRVConnectionData()
 
@@ -82,7 +82,7 @@ func (rvcd RVConnectionData) Copy() RVType {
 	return copied
 }
 
-// Equals checks if the input is equal in value to the current instance
+
 func (rvcd RVConnectionData) Equals(o RVType) bool {
 	if _, ok := o.(RVConnectionData); !ok {
 		return false
@@ -113,26 +113,26 @@ func (rvcd RVConnectionData) Equals(o RVType) bool {
 	return true
 }
 
-// CopyRef copies the current value of the RVConnectionData
-// and returns a pointer to the new copy
+
+
 func (rvcd RVConnectionData) CopyRef() RVTypePtr {
 	copied := rvcd.Copy().(RVConnectionData)
 	return &copied
 }
 
-// Deref takes a pointer to the RVConnectionData
-// and dereferences it to the raw value.
-// Only useful when working with an instance of RVTypePtr
+
+
+
 func (rvcd *RVConnectionData) Deref() RVType {
 	return *rvcd
 }
 
-// String returns a string representation of the struct
+
 func (rvcd RVConnectionData) String() string {
 	return rvcd.FormatToString(0)
 }
 
-// FormatToString pretty-prints the struct data using the provided indentation level
+
 func (rvcd RVConnectionData) FormatToString(indentationLevel int) string {
 	indentationValues := strings.Repeat("\t", indentationLevel+1)
 	indentationEnd := strings.Repeat("\t", indentationLevel)
@@ -150,7 +150,7 @@ func (rvcd RVConnectionData) FormatToString(indentationLevel int) string {
 	return b.String()
 }
 
-// NewRVConnectionData returns a new RVConnectionData
+
 func NewRVConnectionData() RVConnectionData {
 	rvcd := RVConnectionData{
 		StationURL:                 NewStationURL(""),

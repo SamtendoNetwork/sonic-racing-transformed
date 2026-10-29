@@ -28,8 +28,8 @@ func (commonProtocol *CommonProtocol) autoMatchmakeWithSearchCriteriaPostpone(er
 
 	commonProtocol.manager.Mutex.Lock()
 
-	// * A client may disconnect from a session without leaving reliably,
-	// * so let's make sure the client is removed from the session
+
+
 	database.EndMatchmakeSessionsParticipation(commonProtocol.manager, connection)
 
 	var matchmakeSession match_making_types.MatchmakeSession

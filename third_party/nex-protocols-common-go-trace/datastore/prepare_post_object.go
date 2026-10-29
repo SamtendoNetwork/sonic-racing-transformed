@@ -35,14 +35,14 @@ func (commonProtocol *CommonProtocol) preparePostObject(err error, packet nex.Pa
 	connection := packet.Sender()
 	endpoint := connection.Endpoint()
 
-	// TODO - Need to verify what param.PersistenceInitParam.DeleteLastObject really means. It's often set to true even when it wouldn't make sense
+
 	dataID, errCode := commonProtocol.InitializeObjectByPreparePostParam(connection.PID(), param)
 	if errCode != nil {
 		common_globals.Logger.Errorf("Error on object init: %s", errCode.Error())
 		return nil, errCode
 	}
 
-	// TODO - Should this be moved to InitializeObjectByPreparePostParam?
+
 	for _ , ratingInitParamWithSlot := range param.RatingInitParams {
 		errCode = commonProtocol.InitializeObjectRatingWithSlot(dataID, ratingInitParamWithSlot)
 		if errCode != nil {

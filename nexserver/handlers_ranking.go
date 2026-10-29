@@ -9,14 +9,14 @@ import (
 	"github.com/nex-server/sonic-transformed/globals"
 )
 
-// * The Ranking methods nex-protocols-common-go leaves unregistered. Sonic
-// * Transformed's leaderboards and time trials are one of its two headline
-// * online features, so it is worth covering the whole protocol rather than
-// * just the upload/download pair.
 
-// deleteScore removes the caller's score in one category.
-//
-// Response: no return values.
+
+
+
+
+
+
+
 func deleteScore(err error, packet nex.PacketInterface, callID uint32, category types.UInt32, uniqueID types.UInt64) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, err.Error())
@@ -38,9 +38,9 @@ func deleteScore(err error, packet nex.PacketInterface, callID uint32, category 
 	return response, nil
 }
 
-// deleteAllScores removes every score the caller holds.
-//
-// Response: no return values.
+
+
+
 func deleteAllScores(err error, packet nex.PacketInterface, callID uint32, uniqueID types.UInt64) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, err.Error())
@@ -62,9 +62,9 @@ func deleteAllScores(err error, packet nex.PacketInterface, callID uint32, uniqu
 	return response, nil
 }
 
-// deleteCommonData removes the blob stored against a unique ID.
-//
-// Response: no return values.
+
+
+
 func deleteCommonData(err error, packet nex.PacketInterface, callID uint32, uniqueID types.UInt64) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, err.Error())
@@ -86,10 +86,10 @@ func deleteCommonData(err error, packet nex.PacketInterface, callID uint32, uniq
 	return response, nil
 }
 
-// getRankingByPIDList returns the ranks of a specific set of players. This is
-// what a "compare with friends" leaderboard view calls.
-//
-// Response: RankingResult.
+
+
+
+
 func getRankingByPIDList(err error, packet nex.PacketInterface, callID uint32, principalIDList types.List[types.PID], rankingMode rankingconstants.RankingMode, category types.UInt32, orderParam rankingtypes.RankingOrderParam, uniqueID types.UInt64) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, err.Error())
@@ -109,7 +109,7 @@ func getRankingByPIDList(err error, packet nex.PacketInterface, callID uint32, p
 	result.RankDataList = rankData
 	result.TotalCount = types.NewUInt32(totalCount)
 
-	// * 2000-01-01T00:00:00.000Z, which is what the real servers returned.
+
 	result.SinceTime = types.NewDateTime(0x1F40420000)
 
 	stream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
@@ -123,11 +123,11 @@ func getRankingByPIDList(err error, packet nex.PacketInterface, callID uint32, p
 	return response, nil
 }
 
-// getApproxOrder answers "what rank would this score place at?" without
-// uploading it, which is how a game shows a projected position at the end of a
-// race before the player commits the time.
-//
-// Response: Uint32 order.
+
+
+
+
+
 func getApproxOrder(err error, packet nex.PacketInterface, callID uint32, category types.UInt32, orderParam rankingtypes.RankingOrderParam, score types.UInt32, uniqueID types.UInt64, principalID types.PID) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Ranking.InvalidArgument, err.Error())

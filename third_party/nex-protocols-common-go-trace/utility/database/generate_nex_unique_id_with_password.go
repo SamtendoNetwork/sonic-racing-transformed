@@ -10,7 +10,7 @@ import (
 	utility_types "github.com/PretendoNetwork/nex-protocols-go/v2/utility/types"
 )
 
-// GenerateNEXUniqueIDWithPassword generates a unique ID, associated with the given user's PID, optionally adding a password
+
 func GenerateNEXUniqueIDWithPassword(manager *common_globals.UtilityManager, userPID types.PID, usePassword bool) (utility_types.UniqueIDInfo, *nex.Error) {
 	uniqueIDInfo := utility_types.NewUniqueIDInfo()
 
@@ -28,7 +28,7 @@ func GenerateNEXUniqueIDWithPassword(manager *common_globals.UtilityManager, use
 		}
 	}
 
-	// As rare as this should be in the first place, I don't think calling it from itself should be a problem
+
 	nexError := CheckUniqueIDAlreadyExists(manager, uniqueIDInfo)
 	if nexError != nil && nexError.ResultCode == nex.ResultCodes.Core.SystemError {
 		return GenerateNEXUniqueIDWithPassword(manager, userPID, usePassword)

@@ -32,9 +32,9 @@ func (commonProtocol *CommonProtocol) updateSessionURL(err error, packet nex.Pac
 		return nil, nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "change_error")
 	}
 
-	// TODO - Mario Kart 7 seems to set an empty strURL. What does that do if it's actually set?
 
-	// * Only update the host
+
+
 	nexError = database.UpdateSessionHost(commonProtocol.manager, uint32(idGathering), gathering.OwnerPID, connection.PID())
 	if nexError != nil {
 		commonProtocol.manager.Mutex.Unlock()

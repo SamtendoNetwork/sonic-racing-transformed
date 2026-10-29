@@ -42,10 +42,10 @@ func (commonProtocol *CommonProtocol) rateObject(err error, packet nex.PacketInt
 		return nil, errCode
 	}
 
-	// * This is kinda backwards. Server returns
-	// * the rating by default, so we check if
-	// * the client DOESN'T want it and then just
-	// * zero it out
+
+
+
+
 	if !fetchRatings {
 		pRating = datastore_types.NewDataStoreRatingInfo()
 	}

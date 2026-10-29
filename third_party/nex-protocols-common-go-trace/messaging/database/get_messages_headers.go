@@ -9,7 +9,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// GetMessagesHeaders gets the message headers available for the given recipient
+
 func GetMessagesHeaders(manager *common_globals.MessagingManager, recipientID types.UInt64, recipientType messaging_constants.RecipientType, resultRange types.ResultRange) (types.List[messaging_types.UserMessage], *nex.Error) {
 	lstMsgHeaders := make(types.List[messaging_types.UserMessage], 0, resultRange.Length)
 

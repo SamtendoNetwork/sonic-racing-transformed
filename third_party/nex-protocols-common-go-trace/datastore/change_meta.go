@@ -41,7 +41,7 @@ func (commonProtocol *CommonProtocol) changeMeta(err error, packet nex.PacketInt
 		return nil, errCode
 	}
 
-	// TODO - Is this the right permission?
+
 	errCode = commonProtocol.VerifyObjectPermission(metaInfo.OwnerID, connection.PID(), metaInfo.DelPermission)
 	if errCode != nil {
 		return nil, errCode

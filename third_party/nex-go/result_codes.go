@@ -334,10 +334,10 @@ type resultCodes struct {
 	}
 }
 
-// ResultNames contains a map of all the result code string names, indexed by the result code
+
 var ResultNames = map[uint32]string{}
 
-// ResultCodes provides a struct containing RDV result codes using dot-notation
+
 var ResultCodes resultCodes
 
 func initResultCodes() {
@@ -648,7 +648,7 @@ func initResultCodes() {
 	}
 }
 
-// ResultCodeToName returns an error code string for the provided error code
+
 func ResultCodeToName(resultCode uint32) string {
 	name := ResultNames[resultCode]
 

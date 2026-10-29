@@ -33,7 +33,7 @@ func (commonProtocol *CommonProtocol) prepareGetObject(err error, packet nex.Pac
 	var objectInfo datastore_types.DataStoreMetaInfo
 	var errCode *nex.Error
 
-	// * Real server ignores PersistenceTarget if DataID is set
+
 	if param.DataID == 0 {
 		objectInfo, errCode = commonProtocol.GetObjectInfoByPersistenceTargetWithPassword(param.PersistenceTarget, param.AccessPassword)
 	} else {

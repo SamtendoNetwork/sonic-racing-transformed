@@ -2,17 +2,17 @@ package nex
 
 import "sync"
 
-// TODO - This currently only properly supports Go native types, due to the use of == for comparisons. Can this be updated to support custom types?
 
-// MutexSlice implements a slice type with go routine safe accessors through mutex locks.
-//
-// Embeds sync.RWMutex.
+
+
+
+
 type MutexSlice[V comparable] struct {
 	*sync.RWMutex
 	real []V
 }
 
-// Add adds a value to the slice
+
 func (m *MutexSlice[V]) Add(value V) {
 	m.Lock()
 	defer m.Unlock()
@@ -20,9 +20,9 @@ func (m *MutexSlice[V]) Add(value V) {
 	m.real = append(m.real, value)
 }
 
-// Delete removes the first instance of the given value from the slice.
-//
-// Returns true if the value existed and was deleted, otherwise returns false.
+
+
+
 func (m *MutexSlice[V]) Delete(value V) bool {
 	m.Lock()
 	defer m.Unlock()
@@ -37,9 +37,9 @@ func (m *MutexSlice[V]) Delete(value V) bool {
 	return false
 }
 
-// DeleteAll removes all instances of the given value from the slice.
-//
-// Returns true if the value existed and was deleted, otherwise returns false.
+
+
+
 func (m *MutexSlice[V]) DeleteAll(value V) bool {
 	m.Lock()
 	defer m.Unlock()
@@ -58,7 +58,7 @@ func (m *MutexSlice[V]) DeleteAll(value V) bool {
 	return len(newSlice) < oldLength
 }
 
-// Has checks if the slice contains the given value.
+
 func (m *MutexSlice[V]) Has(value V) bool {
 	m.Lock()
 	defer m.Unlock()
@@ -72,9 +72,9 @@ func (m *MutexSlice[V]) Has(value V) bool {
 	return false
 }
 
-// GetIndex checks if the slice contains the given value and returns it's index.
-//
-// Returns -1 if the value does not exist in the slice.
+
+
+
 func (m *MutexSlice[V]) GetIndex(value V) int {
 	m.Lock()
 	defer m.Unlock()
@@ -88,9 +88,9 @@ func (m *MutexSlice[V]) GetIndex(value V) int {
 	return -1
 }
 
-// At returns value at the given index.
-//
-// Returns a bool indicating if the value was found successfully.
+
+
+
 func (m *MutexSlice[V]) At(index int) (V, bool) {
 	m.Lock()
 	defer m.Unlock()
@@ -102,7 +102,7 @@ func (m *MutexSlice[V]) At(index int) (V, bool) {
 	return m.real[index], true
 }
 
-// Values returns the internal slice.
+
 func (m *MutexSlice[V]) Values() []V {
 	m.Lock()
 	defer m.Unlock()
@@ -110,7 +110,7 @@ func (m *MutexSlice[V]) Values() []V {
 	return m.real
 }
 
-// Size returns the length of the internal slice
+
 func (m *MutexSlice[V]) Size() int {
 	m.RLock()
 	defer m.RUnlock()
@@ -118,11 +118,11 @@ func (m *MutexSlice[V]) Size() int {
 	return len(m.real)
 }
 
-// Each runs a callback function for every item in the slice.
-//
-// The slice cannot be modified inside the callback function.
-//
-// Returns true if the loop was terminated early.
+
+
+
+
+
 func (m *MutexSlice[V]) Each(callback func(index int, value V) bool) bool {
 	m.RLock()
 	defer m.RUnlock()
@@ -136,7 +136,7 @@ func (m *MutexSlice[V]) Each(callback func(index int, value V) bool) bool {
 	return false
 }
 
-// Clear removes all items from the slice.
+
 func (m *MutexSlice[V]) Clear() {
 	m.Lock()
 	defer m.Unlock()
@@ -144,7 +144,7 @@ func (m *MutexSlice[V]) Clear() {
 	m.real = make([]V, 0)
 }
 
-// NewMutexSlice returns a new instance of MutexSlice with the provided value type
+
 func NewMutexSlice[V comparable]() *MutexSlice[V] {
 	return &MutexSlice[V]{
 		RWMutex: &sync.RWMutex{},

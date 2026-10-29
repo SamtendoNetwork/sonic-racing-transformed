@@ -12,7 +12,7 @@ import (
 var secureServer *nex.PRUDPServer
 var secureEndpoint *nex.PRUDPEndPoint
 
-// * Took these structs out of the protocols lib for convenience
+
 
 type principalPreference struct {
 	types.Structure
@@ -60,13 +60,13 @@ func startSecureServer() {
 
 			fmt.Println("[SECR]", request.ProtocolID, request.MethodID)
 
-			if request.ProtocolID == 0xB { // * Secure Connection
+			if request.ProtocolID == 0xB {
 				if request.MethodID == 0x4 {
 					registerEx(packet)
 				}
 			}
 
-			if request.ProtocolID == 0x66 { // * Friends (WiiU)
+			if request.ProtocolID == 0x66 {
 				if request.MethodID == 1 {
 					updateAndGetAllInformation(packet)
 				} else if request.MethodID == 19 {
@@ -163,13 +163,13 @@ func updateAndGetAllInformation(packet nex.PRUDPPacketInterface) {
 		Contents:    types.NewString("Rewrite Test"),
 		LastChanged: types.NewDateTime(0),
 	}).WriteTo(responseStream)
-	responseStream.WriteUInt32LE(0) // * Stubbed empty list. responseStream.WriteListStructure(friendList)
-	responseStream.WriteUInt32LE(0) // * Stubbed empty list. responseStream.WriteListStructure(friendRequestsOut)
-	responseStream.WriteUInt32LE(0) // * Stubbed empty list. responseStream.WriteListStructure(friendRequestsIn)
-	responseStream.WriteUInt32LE(0) // * Stubbed empty list. responseStream.WriteListStructure(blockList)
-	responseStream.WriteBool(false) // * Unknown
-	responseStream.WriteUInt32LE(0) // * Stubbed empty list. responseStream.WriteListStructure(notifications)
-	responseStream.WriteBool(false) // * Unknown
+	responseStream.WriteUInt32LE(0)
+	responseStream.WriteUInt32LE(0)
+	responseStream.WriteUInt32LE(0)
+	responseStream.WriteUInt32LE(0)
+	responseStream.WriteBool(false)
+	responseStream.WriteUInt32LE(0)
+	responseStream.WriteBool(false)
 
 	response.IsSuccess = true
 	response.IsRequest = false
@@ -201,7 +201,7 @@ func checkSettingStatus(packet nex.PRUDPPacketInterface) {
 
 	responseStream := nex.NewByteStreamOut(secureEndpoint.LibraryVersions(), secureEndpoint.ByteStreamSettings())
 
-	responseStream.WriteUInt8(0) // * Unknown
+	responseStream.WriteUInt8(0)
 
 	response.IsSuccess = true
 	response.IsRequest = false

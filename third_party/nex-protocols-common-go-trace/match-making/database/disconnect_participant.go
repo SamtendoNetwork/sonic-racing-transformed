@@ -12,7 +12,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// DisconnectParticipant disconnects a participant from all non-persistent gatherings
+
 func DisconnectParticipant(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection) {
 	var nexError *nex.Error
 
@@ -46,14 +46,14 @@ func DisconnectParticipant(manager *common_globals.MatchmakingManager, connectio
 			continue
 		}
 
-		// * If the gathering is a PersistentGathering and the gathering isn't set to leave when disconnecting, ignore and continue
-		//
-		// TODO - Is the match_making.GatheringFlags.PersistentGathering check correct here?
+
+
+
 		if gathering.Flags.HasFlag(match_making_constants.GatheringFlagPersistentGathering) || (gatheringType == "PersistentGathering" && !gathering.Flags.HasFlag(match_making_constants.GatheringFlagNoPersistentParticipation)) {
 			continue
 		}
 
-		// * Since the participant is leaving, override the participant list to avoid sending notifications to them
+
 		participants, nexError = RemoveParticipantFromGathering(manager, uint32(gathering.ID), uint64(connection.PID()))
 		if nexError != nil {
 			common_globals.Logger.Error(nexError.Error())
@@ -66,14 +66,14 @@ func DisconnectParticipant(manager *common_globals.MatchmakingManager, connectio
 			continue
 		}
 
-		// * If the gathering is a persistent gathering and allows zero users, only remove the participant from the gathering
+
 		if gathering.Flags.HasFlag(match_making_constants.GatheringFlagPersistentGathering) || gathering.Flags.HasFlag(match_making_constants.GatheringFlagAllowNoParticipant) {
 			continue
 		}
 
 		if len(participants) == 0 {
-			// * There are no more participants, so we only have to unregister the gathering
-			// * Since the participant is disconnecting, we don't send notification events
+
+
 			nexError = UnregisterGathering(manager, connection.PID(), uint32(gathering.ID))
 			if nexError != nil {
 				common_globals.Logger.Error(nexError.Error())
@@ -84,9 +84,9 @@ func DisconnectParticipant(manager *common_globals.MatchmakingManager, connectio
 
 		ownerPID := uint64(gathering.OwnerPID)
 		if connection.PID().Equals(gathering.OwnerPID) {
-			// * This flag tells the server to change the matchmake session owner if they disconnect
-			// * If the flag is not set, delete the session
-			// * More info: https://nintendo-wiki.pretendo.network/docs/nex/protocols/match-making/types#flags
+
+
+
 			if !gathering.Flags.HasFlag(match_making_constants.GatheringFlagMigrateOwner) {
 				nexError = UnregisterGathering(manager, connection.PID(), uint32(gathering.ID))
 				if nexError != nil {
@@ -110,8 +110,8 @@ func DisconnectParticipant(manager *common_globals.MatchmakingManager, connectio
 			}
 		}
 
-		// * If the host has disconnected, set the owner as the new host. We can guarantee that the ownerPID is not zero,
-		// * since otherwise the gathering would have been unregistered by MigrateGatheringOwnership
+
+
 		if connection.PID().Equals(gathering.HostPID) && ownerPID != 0 {
 			nexError = UpdateSessionHost(manager, uint32(gathering.ID), types.NewPID(ownerPID), types.NewPID(ownerPID))
 			if nexError != nil {
@@ -122,7 +122,7 @@ func DisconnectParticipant(manager *common_globals.MatchmakingManager, connectio
 				oEvent.Type = notifications_constants.NotificationCategoryHostChangeEvent.Build()
 				oEvent.Param1 = types.UInt64(gathering.ID)
 
-				// TODO - Should the notification actually be sent to all participants?
+
 				common_globals.SendNotificationEvent(connection.Endpoint().(*nex.PRUDPEndPoint), oEvent, common_globals.RemoveDuplicates(participants))
 
 				nexError = tracking.LogChangeHost(manager.Database, connection.PID(), uint32(gathering.ID), gathering.HostPID, types.NewPID(ownerPID))
@@ -141,14 +141,14 @@ func DisconnectParticipant(manager *common_globals.MatchmakingManager, connectio
 
 		var participantEndedTargets []uint64
 
-		// * When the VerboseParticipants or VerboseParticipantsEx flags are set, all participant notification events are sent to everyone
+
 		if gathering.Flags.HasFlag(match_making_constants.GatheringFlagNotifyParticipationEventsToAllParticipants) || gathering.Flags.HasFlag(match_making_constants.GatheringFlagNotifyParticipationEventsToAllParticipantsReproducibly) {
 			participantEndedTargets = common_globals.RemoveDuplicates(participants)
 		} else {
 			participantEndedTargets = []uint64{uint64(gathering.OwnerPID)}
 		}
 
-		// * Only send the notification event to the owner
+
 		common_globals.SendNotificationEvent(connection.Endpoint().(*nex.PRUDPEndPoint), oEvent, participantEndedTargets)
 	}
 

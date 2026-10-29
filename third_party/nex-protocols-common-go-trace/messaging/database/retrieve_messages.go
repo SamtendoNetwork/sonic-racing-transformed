@@ -9,7 +9,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// RetrieveMessages retrieves the specified messages for the given recipient
+
 func RetrieveMessages(manager *common_globals.MessagingManager, recipientID types.UInt64, recipientType messaging_constants.RecipientType, lstMsgIDs types.List[types.UInt32], bLeaveOnServer types.Bool) (types.List[types.DataHolder], *nex.Error) {
 	lstMessages := make(types.List[types.DataHolder], 0, len(lstMsgIDs))
 

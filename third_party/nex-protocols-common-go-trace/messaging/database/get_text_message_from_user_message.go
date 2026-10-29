@@ -7,7 +7,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// GetTextMessageFromUserMessage gets the text body for a given user message
+
 func GetTextMessageFromUserMessage(manager *common_globals.MessagingManager, messageHeader messaging_types.UserMessage) (messaging_types.TextMessage, *nex.Error) {
 	var textMessage messaging_types.TextMessage
 	var err error

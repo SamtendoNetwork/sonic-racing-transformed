@@ -6,7 +6,7 @@ import (
 	notifications_types "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/types"
 )
 
-// UpdateNotificationData updates the notification data of the specified user and type
+
 func UpdateNotificationData(manager *common_globals.MatchmakingManager, notificationData notifications_types.NotificationEvent) *nex.Error {
 	_, err := manager.Database.Exec(`INSERT INTO matchmaking.notifications AS n (
 		source_pid,

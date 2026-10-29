@@ -7,24 +7,24 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// RMCMessage represents a message in the RMC (Remote Method Call) protocol
+
 type RMCMessage struct {
 	Endpoint         EndpointInterface
-	IsRequest        bool                         // * Indicates if the message is a request message (true) or response message (false)
-	IsSuccess        bool                         // * Indicates if the message is a success message (true) for a response message
-	IsHPP            bool                         // * Indicates if the message is an HPP message
-	ProtocolID       uint16                       // * Protocol ID of the message. Only present in "packed" variations
-	ProtocolName     types.String                 // * Protocol name of the message. Only present in "verbose" variations
-	CallID           uint32                       // * Call ID associated with the message
-	MethodID         uint32                       // * Method ID in the requested protocol. Only present in "packed" variations
-	MethodName       types.String                 // * Method name in the requested protocol. Only present in "verbose" variations
-	ErrorCode        uint32                       // * Error code for a response message
-	VersionContainer *types.ClassVersionContainer // * Contains version info for Structures in the request. Only present in "verbose" variations. Pointer to allow for nil checks
-	Parameters       []byte                       // * Input for the method
-	// TODO - Verbose messages suffix response method names with "*". Should we have a "HasResponsePointer" sort of field?
+	IsRequest        bool
+	IsSuccess        bool
+	IsHPP            bool
+	ProtocolID       uint16
+	ProtocolName     types.String
+	CallID           uint32
+	MethodID         uint32
+	MethodName       types.String
+	ErrorCode        uint32
+	VersionContainer *types.ClassVersionContainer
+	Parameters       []byte
+
 }
 
-// Copy copies the message into a new RMCMessage
+
 func (rmc *RMCMessage) Copy() *RMCMessage {
 	copied := NewRMCMessage(rmc.Endpoint)
 
@@ -45,7 +45,7 @@ func (rmc *RMCMessage) Copy() *RMCMessage {
 	return copied
 }
 
-// FromBytes decodes an RMCMessage from the given byte slice.
+
 func (rmc *RMCMessage) FromBytes(data []byte) error {
 	if rmc.Endpoint.UseVerboseRMC() {
 		return rmc.decodeVerbose(data)
@@ -206,7 +206,7 @@ func (rmc *RMCMessage) decodeVerbose(data []byte) error {
 	return nil
 }
 
-// Bytes serializes the RMCMessage to a byte slice.
+
 func (rmc *RMCMessage) Bytes() []byte {
 	if rmc.Endpoint.UseVerboseRMC() {
 		return rmc.encodeVerbose()
@@ -218,15 +218,15 @@ func (rmc *RMCMessage) Bytes() []byte {
 func (rmc *RMCMessage) encodePacked() []byte {
 	stream := NewByteStreamOut(rmc.Endpoint.LibraryVersions(), rmc.Endpoint.ByteStreamSettings())
 
-	// * RMC requests have their protocol IDs ORed with 0x80
+
 	var protocolIDFlag uint16 = 0x80
 	if !rmc.IsRequest {
 		protocolIDFlag = 0
 	}
 
-	// * HPP does not include the protocol ID on the response. We technically
-	// * don't have to support converting HPP requests to bytes but we'll
-	// * do it for accuracy.
+
+
+
 	if !rmc.IsHPP || (rmc.IsHPP && rmc.IsRequest) {
 		if rmc.ProtocolID < 0x80 {
 			stream.WriteUInt8(uint8(rmc.ProtocolID | protocolIDFlag))
@@ -285,7 +285,7 @@ func (rmc *RMCMessage) encodeVerbose() []byte {
 		if rmc.VersionContainer != nil {
 			rmc.VersionContainer.WriteTo(stream)
 		} else {
-			// * Fail safe. This is always present even if no structures are used
+
 			stream.WriteUInt32LE(0)
 		}
 
@@ -321,14 +321,14 @@ func (rmc *RMCMessage) encodeVerbose() []byte {
 	return message.Bytes()
 }
 
-// NewRMCMessage returns a new generic RMC Message
+
 func NewRMCMessage(endpoint EndpointInterface) *RMCMessage {
 	return &RMCMessage{
 		Endpoint: endpoint,
 	}
 }
 
-// NewRMCRequest returns a new blank RMCRequest
+
 func NewRMCRequest(endpoint EndpointInterface) *RMCMessage {
 	return &RMCMessage{
 		Endpoint:  endpoint,
@@ -336,7 +336,7 @@ func NewRMCRequest(endpoint EndpointInterface) *RMCMessage {
 	}
 }
 
-// NewRMCSuccess returns a new RMC Message configured as a success response
+
 func NewRMCSuccess(endpoint EndpointInterface, parameters []byte) *RMCMessage {
 	message := NewRMCMessage(endpoint)
 	message.IsRequest = false
@@ -346,7 +346,7 @@ func NewRMCSuccess(endpoint EndpointInterface, parameters []byte) *RMCMessage {
 	return message
 }
 
-// NewRMCError returns a new RMC Message configured as a error response
+
 func NewRMCError(endpoint EndpointInterface, errorCode uint32) *RMCMessage {
 	if int(errorCode)&errorMask == 0 {
 		errorCode = uint32(int(errorCode) | errorMask)

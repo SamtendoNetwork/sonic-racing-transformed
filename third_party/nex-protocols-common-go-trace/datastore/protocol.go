@@ -72,19 +72,19 @@ func (c *CommonProtocol) VerifyObjectPermission(ownerPID, accessorPID types.PID,
 		return nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "change_error")
 	}
 
-	// * Owner can always access their own objects
+
 	if ownerPID.Equals(accessorPID) {
 		return nil
 	}
 
-	// * Allow anyone
+
 	if permission.Permission == 0 {
 		return nil
 	}
 
-	// * Allow only friends of the owner
+
 	if permission.Permission == 1 {
-		// TODO - This assumes a legacy client. Will not work on the Switch
+
 		friendsList := c.GetUserFriendPIDs(uint32(ownerPID))
 
 		if !slices.Contains(friendsList, uint32(accessorPID)) {
@@ -92,14 +92,14 @@ func (c *CommonProtocol) VerifyObjectPermission(ownerPID, accessorPID types.PID,
 		}
 	}
 
-	// * Allow only users whose PIDs are defined in permission.RecipientIDs
+
 	if permission.Permission == 2 {
 		if !permission.RecipientIDs.Contains(accessorPID) {
 			return nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
 		}
 	}
 
-	// * Allow only the owner
+
 	if permission.Permission == 3 {
 		if !ownerPID.Equals(accessorPID) {
 			return nex.NewError(nex.ResultCodes.DataStore.PermissionDenied, "change_error")
@@ -109,29 +109,29 @@ func (c *CommonProtocol) VerifyObjectPermission(ownerPID, accessorPID types.PID,
 	return nil
 }
 
-// SetDataKeyBase sets the base for the key to be used when uploading standard DataStore objects
+
 func (c *CommonProtocol) SetDataKeyBase(base string) {
-	// * Just in case someone passes a badly formatted key
+
 	base = strings.TrimPrefix(base, "/")
 	base = strings.TrimSuffix(base, "/")
 	c.s3DataKeyBase = base
 }
 
-// SetNotifyKeyBase sets the base for the key to be used when uploading DataStore notification data
+
 func (c *CommonProtocol) SetNotifyKeyBase(base string) {
-	// * Just in case someone passes a badly formatted key
+
 	base = strings.TrimPrefix(base, "/")
 	base = strings.TrimSuffix(base, "/")
 	c.s3NotifyKeyBase = base
 }
 
-// SetMinIOClient sets the MinIO S3 client
+
 func (c *CommonProtocol) SetMinIOClient(client *minio.Client) {
 	c.minIOClient = client
 	c.S3Presigner = NewS3Presigner(c.minIOClient)
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol datastore.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint:   protocol.Endpoint(),

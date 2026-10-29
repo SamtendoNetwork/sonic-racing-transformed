@@ -13,7 +13,7 @@ type CommonProtocol struct {
 	manager  *common_globals.UtilityManager
 }
 
-// SetManager defines the utility manager to be used by the common protocol
+
 func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.UtilityManager) {
 	var err error
 
@@ -43,7 +43,7 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Utility
 	}
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol utility.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint: protocol.Endpoint(),

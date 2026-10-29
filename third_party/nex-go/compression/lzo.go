@@ -7,12 +7,12 @@ import (
 	"github.com/rasky/go-lzo"
 )
 
-// TODO - Untested. I think this works. Maybe. Verify and remove this comment
 
-// LZO implements packet payload compression using LZO
+
+
 type LZO struct{}
 
-// Compress compresses the payload using LZO
+
 func (l *LZO) Compress(payload []byte) ([]byte, error) {
 	compressed := lzo.Compress1X(payload)
 
@@ -27,13 +27,13 @@ func (l *LZO) Compress(payload []byte) ([]byte, error) {
 	return result, nil
 }
 
-// Decompress decompresses the payload using LZO
+
 func (l *LZO) Decompress(payload []byte) ([]byte, error) {
 	compressionRatio := payload[0]
 	compressed := payload[1:]
 
 	if compressionRatio == 0 {
-		// * Compression ratio of 0 means no compression
+
 		return compressed, nil
 	}
 
@@ -52,12 +52,12 @@ func (l *LZO) Decompress(payload []byte) ([]byte, error) {
 	return decompressed, nil
 }
 
-// Copy returns a copy of the algorithm
+
 func (l *LZO) Copy() Algorithm {
 	return NewLZOCompression()
 }
 
-// NewLZOCompression returns a new instance of the LZO compression
+
 func NewLZOCompression() *LZO {
 	return &LZO{}
 }

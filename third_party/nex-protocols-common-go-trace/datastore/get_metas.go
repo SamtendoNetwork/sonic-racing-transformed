@@ -22,15 +22,15 @@ func (commonProtocol *CommonProtocol) getMetas(err error, packet nex.PacketInter
 	connection := packet.Sender()
 	endpoint := connection.Endpoint()
 
-	// TODO - Verify if param.PersistenceTarget is respected? It wouldn't make sense here but who knows
+
 
 	pMetaInfo := types.NewList[datastore_types.DataStoreMetaInfo]()
 	pResults := types.NewList[types.QResult]()
 
-	// * param has an AccessPassword, but it goes unchecked here.
-	// * The password would need to be the same for every object
-	// * in the input array, which doesn't make any sense. Assuming
-	// * it's unused until proven otherwise
+
+
+
+
 
 	for _, dataID := range dataIDs {
 		objectInfo, errCode := commonProtocol.GetObjectInfoByDataID(dataID)

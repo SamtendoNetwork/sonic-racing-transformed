@@ -9,7 +9,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// CreatePersistentGathering creates a new PersistentGathering on the database. No participants are added
+
 func CreatePersistentGathering(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection, persistentGathering *match_making_types.PersistentGathering) *nex.Error {
 	_, nexError := match_making_database.RegisterGathering(manager, connection.PID(), types.NewPID(0), &persistentGathering.Gathering, "PersistentGathering")
 	if nexError != nil {

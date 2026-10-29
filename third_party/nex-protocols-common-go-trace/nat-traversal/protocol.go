@@ -16,7 +16,7 @@ type CommonProtocol struct {
 	OnAfterReportNATTraversalResultDetail func(packet nex.PacketInterface, cid types.UInt32, result types.Bool, detail types.Int32, rtt types.UInt32)
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol nat_traversal.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint: protocol.Endpoint(),

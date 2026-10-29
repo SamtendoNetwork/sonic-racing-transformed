@@ -17,7 +17,7 @@ func (commonProtocol *CommonProtocol) deliverMessage(err error, packet nex.Packe
 	connection := packet.Sender().(*nex.PRUDPConnection)
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 
-	// NOTE - This method will silently fail on any errors
+
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = message_delivery.ProtocolID
 	rmcResponse.MethodID = message_delivery.MethodDeliverMessage

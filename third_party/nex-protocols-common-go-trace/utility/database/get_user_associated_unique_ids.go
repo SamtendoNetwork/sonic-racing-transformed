@@ -7,7 +7,7 @@ import (
 	utility_types "github.com/PretendoNetwork/nex-protocols-go/v2/utility/types"
 )
 
-// GetUserAssociatedUniqueIDs gets all unique ID + password (if applicable) combinations associated with a user's PID
+
 func GetUserAssociatedUniqueIDs(manager *common_globals.UtilityManager, userPID types.PID) (types.List[utility_types.UniqueIDInfo], *nex.Error) {
 	rows, err := manager.Database.Query(`
 			SELECT

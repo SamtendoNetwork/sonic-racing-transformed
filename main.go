@@ -1,25 +1,23 @@
-// Command sonic-transformed runs a standalone NEX game server for the Wii U
-// version of Sonic & All-Stars Racing Transformed.
-//
-//	Game server ID   0x10111F00
-//	Access key       b26a3421
-//	NEX libraries    nex 3.0.1, nexmm 3.0.1, nexrk 3.0.1
-//
-// See README.md for how a console is pointed at it.
+
+
+
+
+
+
+
+
 package main
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	// * Blank import: nex-protocols-go's init() registers the object holder
-	// * types (Gathering, MatchmakeSession, NintendoLoginData, ...) without
-	// * which a GatheringHolder or login DataHolder cannot be decoded.
-	// * Importing a subpackage does not run it, so this must be explicit.
+
+
+
+
 	_ "github.com/PretendoNetwork/nex-protocols-go/v2"
 
 	"github.com/PretendoNetwork/plogger-go"
@@ -45,10 +43,13 @@ func main() {
 
 	globals.InitAccounts()
 
-	if err := globals.LoadAccounts(); err != nil {
+	accountConnection, err := globals.ConnectAccounts()
+	if err != nil {
 		globals.Logger.Criticalf("%v", err)
 		os.Exit(1)
 	}
+
+	defer accountConnection.Close()
 
 	rankingStore, err := ranking.NewStore(globals.Settings.DataDir)
 	if err != nil {
@@ -60,8 +61,8 @@ func main() {
 
 	banner()
 
-	// * Listen() blocks forever and panics on a socket error, so each server
-	// * gets its own goroutine and the main one waits for a signal.
+
+
 	go nexserver.StartAuthenticationServer()
 	go nexserver.StartSecureServer()
 
@@ -73,8 +74,8 @@ func main() {
 	globals.Logger.Info("Shutting down")
 }
 
-// validateConfig rejects a configuration that cannot possibly work, rather than
-// letting the server start and fail silently later.
+
+
 func validateConfig() error {
 	settings := globals.Settings
 
@@ -98,20 +99,14 @@ func validateConfig() error {
 		return fmt.Errorf("SONIC_SECURE_SERVER_HOST must be set to an address the console can reach")
 	}
 
-	// * Without a secret, every derived password would be HMAC'd under the
-	// * empty key - identical on every deployment, and therefore public. Mint a
-	// * random one rather than shipping a predictable default.
-	if settings.AccountSecret == "" && settings.AllowUnknownAccounts {
-		secret := make([]byte, 32)
-		if _, err := rand.Read(secret); err != nil {
-			return fmt.Errorf("failed to generate an account secret: %w", err)
-		}
-
-		globals.Settings.AccountSecret = hex.EncodeToString(secret)
-
-		globals.Logger.Warning("SONIC_ACCOUNT_SECRET is not set, so a random one was generated for this run.")
-		globals.Logger.Warning("Derived passwords will change on every restart. Set it to a fixed value,")
-		globals.Logger.Warning("and give the same value to whatever account server issues NEX tokens.")
+	if settings.AccountGRPCHost == "" {
+		return fmt.Errorf("SONIC_ACCOUNT_GRPC_HOST must be set to the accounts service host")
+	}
+	if settings.AccountGRPCPort < 1 || settings.AccountGRPCPort > 65535 {
+		return fmt.Errorf("SONIC_ACCOUNT_GRPC_PORT must be a valid accounts gRPC port")
+	}
+	if settings.AccountGRPCAPIKey == "" {
+		return fmt.Errorf("SONIC_ACCOUNT_GRPC_API_KEY must match accounts' PN_ACT_CONFIG_GRPC_MASTER_API_KEY_ACCOUNT")
 	}
 
 	return nil

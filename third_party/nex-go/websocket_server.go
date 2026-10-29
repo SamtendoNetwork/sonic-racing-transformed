@@ -14,7 +14,7 @@ type wsEventHandler struct {
 func (wseh *wsEventHandler) OnOpen(socket *gws.Conn) {}
 
 func (wseh *wsEventHandler) OnClose(wsConn *gws.Conn, _ error) {
-	// * Loop over all connections on all endpoints
+
 	wseh.prudpServer.Endpoints.Each(func(streamid uint8, pep *PRUDPEndPoint) bool {
 		connections := make([]*PRUDPConnection, 0)
 
@@ -25,12 +25,12 @@ func (wseh *wsEventHandler) OnClose(wsConn *gws.Conn, _ error) {
 			return false
 		})
 
-		// * We cannot modify a MutexMap while looping over it
-		// * since the mutex is locked. We first need to grab
-		// * the entries we want to delete, and then loop over
-		// * them here to actually clean them up
+
+
+
+
 		for _, connection := range connections {
-			pep.CleanupConnection(connection) // * "removed" event is dispatched here
+			pep.CleanupConnection(connection)
 		}
 		return false
 	})
@@ -45,9 +45,9 @@ func (wseh *wsEventHandler) OnPong(socket *gws.Conn, payload []byte) {}
 func (wseh *wsEventHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 	defer message.Close()
 
-	// * Create a COPY of the underlying *bytes.Buffer bytes.
-	// * If this is not done, then the byte slice sometimes
-	// * gets modified in unexpected places
+
+
+
 	packetData := append([]byte(nil), message.Bytes()...)
 	err := wseh.prudpServer.handleSocketMessage(packetData, socket.RemoteAddr(), socket)
 	if err != nil {
@@ -55,7 +55,7 @@ func (wseh *wsEventHandler) OnMessage(socket *gws.Conn, message *gws.Message) {
 	}
 }
 
-// WebSocketServer wraps a WebSocket server to create an easier API to consume
+
 type WebSocketServer struct {
 	mux         *http.ServeMux
 	upgrader    *gws.Upgrader
@@ -66,8 +66,8 @@ func (ws *WebSocketServer) init() {
 	ws.upgrader = gws.NewUpgrader(&wsEventHandler{
 		prudpServer: ws.prudpServer,
 	}, &gws.ServerOption{
-		ParallelEnabled: true,         // * Parallel message processing
-		Recovery:        gws.Recovery, // * Exception recovery
+		ParallelEnabled: true,
+		Recovery:        gws.Recovery,
 		ReadBufferSize:  64000,
 		WriteBufferSize: 64000,
 	})
@@ -80,7 +80,7 @@ func (ws *WebSocketServer) init() {
 		}
 
 		go func() {
-			socket.ReadLoop() // * Blocking prevents the context from being GC
+			socket.ReadLoop()
 		}()
 	})
 }

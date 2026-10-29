@@ -2,6 +2,12 @@
 
 SART server for Samtendo Network! :)
 
+## Build
+
+```sh
+go build -o build/sonic-transformed .
+```
+
 ## Credits
 
 Built on:

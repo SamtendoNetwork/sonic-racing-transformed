@@ -29,7 +29,7 @@ func (commonProtocol *CommonProtocol) getMeta(err error, packet nex.PacketInterf
 	var pMetaInfo datastore_types.DataStoreMetaInfo
 	var errCode *nex.Error
 
-	// * Real server ignores PersistenceTarget if DataID is set
+
 	if param.DataID == 0 {
 		pMetaInfo, errCode = commonProtocol.GetObjectInfoByPersistenceTargetWithPassword(param.PersistenceTarget, param.AccessPassword)
 	} else {

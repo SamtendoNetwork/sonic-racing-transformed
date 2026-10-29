@@ -1,11 +1,11 @@
-// Package ranking implements persistent leaderboards and per-user common data
-// for the Ranking protocol (0x70).
-//
-// Sonic & All-Stars Racing Transformed links nexrk but not nexds, so the
-// Ranking protocol's "common data" blob is the only server-side per-user
-// storage the game can reach - there is no DataStore to fall back on. That
-// makes this package the one part of the server whose contents are worth
-// keeping across restarts, so it persists to a JSON file.
+
+
+
+
+
+
+
+
 package ranking
 
 import (
@@ -21,62 +21,62 @@ import (
 	rankingtypes "github.com/PretendoNetwork/nex-protocols-go/v2/ranking/types"
 )
 
-// Entry is one player's score in one category.
+
 type Entry struct {
 	PID      uint64 `json:"pid"`
 	UniqueID uint64 `json:"uniqueId"`
 	Category uint32 `json:"category"`
 	Score    uint32 `json:"score"`
 
-	// OrderBy records how the game wants this category ranked, taken from the
-	// score upload. 0 sorts ascending (lowest first, which is what a lap time
-	// leaderboard wants); 1 sorts descending.
+
+
+
 	OrderBy uint8 `json:"orderBy"`
 
-	// Groups is the game-defined grouping blob, used to filter a leaderboard
-	// (by track, by vehicle class, and so on).
+
+
 	Groups []byte `json:"groups,omitempty"`
 
-	// Param is a game-defined value carried alongside the score. Racing games
-	// typically use it for a ghost data reference or a replay identifier.
+
+
 	Param uint64 `json:"param"`
 
-	// UpdateTime is when the score was last accepted, as a NEX DateTime.
+
 	UpdateTime uint64 `json:"updateTime"`
 }
 
-// persistedState is the on-disk format.
+
 type persistedState struct {
-	// Scores are keyed by category, then by PID.
+
 	Scores map[string]map[string]*Entry `json:"scores"`
 
-	// CommonData is keyed by unique ID.
+
 	CommonData map[string][]byte `json:"commonData"`
 }
 
-// Store holds leaderboards and common data.
+
 type Store struct {
 	mutex sync.RWMutex
 
-	// scores maps category -> PID -> entry. One score per player per category,
-	// which is how NEX leaderboards work: a new upload replaces the old entry
-	// rather than adding to it.
+
+
+
 	scores map[uint32]map[uint64]*Entry
 
-	// commonData maps unique ID -> blob.
+
 	commonData map[uint64][]byte
 
 	path string
 
-	// GetUserFriendPIDs resolves a friend list for the friends-only ranking
-	// modes. Without a friends server it returns nothing, so those modes
-	// correctly report no results rather than leaking the global leaderboard.
+
+
+
 	GetUserFriendPIDs func(pid uint32) []uint32
 }
 
-// Sonic uploads ranking common data with unique ID 0 for every player. Keep
-// that wire value untouched, but namespace the internal lookup by PID so one
-// player's display name cannot overwrite every leaderboard row.
+
+
+
 func perPlayerCommonDataKey(pid uint64, uniqueID uint64) uint64 {
 	if uniqueID == 0 {
 		return (uint64(1) << 63) | pid
@@ -85,8 +85,8 @@ func perPlayerCommonDataKey(pid uint64, uniqueID uint64) uint64 {
 	return uniqueID
 }
 
-// NewStore returns a Store persisting to dataDir/ranking.json, loading any
-// existing contents.
+
+
 func NewStore(dataDir string) (*Store, error) {
 	store := &Store{
 		scores:     make(map[uint32]map[uint64]*Entry),
@@ -149,10 +149,10 @@ func (s *Store) load() error {
 	return nil
 }
 
-// save writes the store to disk. The caller must hold at least the read lock.
-//
-// The write goes to a temporary file first and is then renamed over the target,
-// so a crash mid-write cannot leave a truncated leaderboard behind.
+
+
+
+
 func (s *Store) save() error {
 	state := persistedState{
 		Scores:     make(map[string]map[string]*Entry, len(s.scores)),
@@ -193,21 +193,21 @@ func (s *Store) save() error {
 	return nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Score storage
-// * ---------------------------------------------------------------------------
 
-// InsertRankingByPIDAndRankingScoreData records a score upload.
-//
-// UpdateMode decides what happens when the player already has a score in this
-// category. NEX does not document the enum, so this server takes the reading
-// that makes a leaderboard behave the way players expect:
-//
-//	UpdateModeNormal (0)  keep whichever score is better, per OrderBy
-//	anything else         overwrite unconditionally
-//
-// Keeping the better score is the safe default: a player who posts a worse lap
-// time on a later run does not lose their record.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 func (s *Store) InsertRankingByPIDAndRankingScoreData(pid types.PID, scoreData rankingtypes.RankingScoreData, uniqueID types.UInt64) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -233,7 +233,7 @@ func (s *Store) InsertRankingByPIDAndRankingScoreData(pid types.PID, scoreData r
 
 	if hasExisting && scoreData.UpdateMode == rankingconstants.UpdateModeNormal {
 		if !betterThan(candidate.Score, existing.Score, candidate.OrderBy) {
-			// * The existing score stands, but the upload is not an error.
+
 			return nil
 		}
 	}
@@ -243,17 +243,17 @@ func (s *Store) InsertRankingByPIDAndRankingScoreData(pid types.PID, scoreData r
 	return s.save()
 }
 
-// betterThan reports whether score beats other under the given ordering.
+
 func betterThan(score uint32, other uint32, orderBy uint8) bool {
 	if rankingconstants.OrderBy(orderBy) == rankingconstants.OrderByDescending {
 		return score > other
 	}
 
-	// * Ascending: a lower value is better, which is what lap times need.
+
 	return score < other
 }
 
-// DeleteScore removes a player's score in one category.
+
 func (s *Store) DeleteScore(pid uint64, category uint32) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -269,7 +269,7 @@ func (s *Store) DeleteScore(pid uint64, category uint32) error {
 	return s.save()
 }
 
-// DeleteAllScores removes every score a player holds.
+
 func (s *Store) DeleteAllScores(pid uint64) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -285,11 +285,11 @@ func (s *Store) DeleteAllScores(pid uint64) error {
 	return s.save()
 }
 
-// * ---------------------------------------------------------------------------
-// * Common data
-// * ---------------------------------------------------------------------------
 
-// GetCommonData returns the blob stored for a unique ID.
+
+
+
+
 func (s *Store) GetCommonData(uniqueID types.UInt64) (types.Buffer, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -302,7 +302,7 @@ func (s *Store) GetCommonData(uniqueID types.UInt64) (types.Buffer, error) {
 	return types.NewBuffer(append([]byte(nil), blob...)), nil
 }
 
-// UploadCommonData stores a blob against a unique ID.
+
 func (s *Store) UploadCommonData(pid types.PID, uniqueID types.UInt64, commonData types.Buffer) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -311,9 +311,9 @@ func (s *Store) UploadCommonData(pid types.PID, uniqueID types.UInt64, commonDat
 	wireUniqueID := uint64(uniqueID)
 	s.commonData[perPlayerCommonDataKey(uint64(pid), wireUniqueID)] = blob
 
-	// Preserve the legacy shared key because GetCommonData does not carry a
-	// PID. Ranking rows use the per-player key above; direct ID 0 reads retain
-	// the exact behaviour expected by the game.
+
+
+
 	if wireUniqueID == 0 {
 		s.commonData[0] = append([]byte(nil), blob...)
 	}
@@ -321,7 +321,7 @@ func (s *Store) UploadCommonData(pid types.PID, uniqueID types.UInt64, commonDat
 	return s.save()
 }
 
-// DeleteCommonData removes the blob for a unique ID.
+
 func (s *Store) DeleteCommonData(uniqueID uint64) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -331,20 +331,20 @@ func (s *Store) DeleteCommonData(uniqueID uint64) error {
 	return s.save()
 }
 
-// * ---------------------------------------------------------------------------
-// * Leaderboard queries
-// * ---------------------------------------------------------------------------
 
-// rankedEntries returns a category's entries in rank order.
-// The caller must hold at least the read lock.
+
+
+
+
+
 func (s *Store) rankedEntries(category uint32) []*Entry {
 	entries := make([]*Entry, 0, len(s.scores[category]))
 	for _, entry := range s.scores[category] {
 		entries = append(entries, entry)
 	}
 
-	// * Every entry in a category shares an ordering in practice, since the
-	// * game uploads a consistent OrderBy. Take it from the first entry.
+
+
 	orderBy := uint8(0)
 	if len(entries) > 0 {
 		orderBy = entries[0].OrderBy
@@ -355,22 +355,22 @@ func (s *Store) rankedEntries(category uint32) []*Entry {
 			return betterThan(entries[a].Score, entries[b].Score, orderBy)
 		}
 
-		// * Tie break on who got there first, so ranks are stable.
+
 		return entries[a].UpdateTime < entries[b].UpdateTime
 	})
 
 	return entries
 }
 
-// rankData converts entries to RankingRankData, assigning ranks.
-//
-// ranks are 1-based and computed over the FULL ordered list before slicing, so
-// a player at offset 50 correctly reports rank 51 rather than rank 1.
+
+
+
+
 func (s *Store) rankData(ordered []*Entry, selected []*Entry, orderCalculation rankingconstants.OrderCalculation) types.List[rankingtypes.RankingRankData] {
 	ranks := make(map[uint64]uint32, len(ordered))
 
-	// * OrderCalculation 0 is standard competition ranking (1,2,2,4);
-	// * 1 is ordinal ranking (1,2,3,4).
+
+
 	standard := orderCalculation == rankingconstants.OrderCalculation113
 
 	var previousScore uint32
@@ -401,8 +401,8 @@ func (s *Store) rankData(ordered []*Entry, selected []*Entry, orderCalculation r
 		data.Param = types.NewUInt64(entry.Param)
 		commonData, ok := s.commonData[perPlayerCommonDataKey(entry.PID, entry.UniqueID)]
 		if !ok {
-			// Existing ranking files only have the legacy key. This fallback
-			// keeps them readable until that player uploads common data again.
+
+
 			commonData = s.commonData[entry.UniqueID]
 		}
 		data.CommonData = types.NewBuffer(append([]byte(nil), commonData...))
@@ -414,7 +414,7 @@ func (s *Store) rankData(ordered []*Entry, selected []*Entry, orderCalculation r
 	return list
 }
 
-// slice applies a RankingOrderParam's offset and length.
+
 func slice(entries []*Entry, orderParam rankingtypes.RankingOrderParam) []*Entry {
 	offset := int(orderParam.Offset)
 	length := int(orderParam.Length)
@@ -432,8 +432,8 @@ func slice(entries []*Entry, orderParam rankingtypes.RankingOrderParam) []*Entry
 	return selected
 }
 
-// GetRankingsAndCountByCategoryAndRankingOrderParam serves RankingMode 0, the
-// global leaderboard.
+
+
 func (s *Store) GetRankingsAndCountByCategoryAndRankingOrderParam(category types.UInt32, orderParam rankingtypes.RankingOrderParam) (types.List[rankingtypes.RankingRankData], uint32, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -444,16 +444,16 @@ func (s *Store) GetRankingsAndCountByCategoryAndRankingOrderParam(category types
 	return s.rankData(ordered, selected, orderParam.OrderCalculation), uint32(len(ordered)), nil
 }
 
-// GetNearbyRankingsAndCountByCategoryAndRankingOrderParam serves RankingMode 1,
-// the entries surrounding the caller.
+
+
 func (s *Store) GetNearbyRankingsAndCountByCategoryAndRankingOrderParam(pid types.PID, category types.UInt32, orderParam rankingtypes.RankingOrderParam) (types.List[rankingtypes.RankingRankData], uint32, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
 	ordered := s.rankedEntries(uint32(category))
 
-	// * Centre the window on the caller. Offset is relative to their position
-	// * rather than to the top of the board for this mode.
+
+
 	position := -1
 	for index, entry := range ordered {
 		if entry.PID == uint64(pid) {
@@ -484,7 +484,7 @@ func (s *Store) GetNearbyRankingsAndCountByCategoryAndRankingOrderParam(pid type
 	return s.rankData(ordered, ordered[start:end], orderParam.OrderCalculation), uint32(len(ordered)), nil
 }
 
-// GetFriendsRankingsAndCountByCategoryAndRankingOrderParam serves RankingMode 2.
+
 func (s *Store) GetFriendsRankingsAndCountByCategoryAndRankingOrderParam(pid types.PID, category types.UInt32, orderParam rankingtypes.RankingOrderParam) (types.List[rankingtypes.RankingRankData], uint32, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -496,8 +496,8 @@ func (s *Store) GetFriendsRankingsAndCountByCategoryAndRankingOrderParam(pid typ
 	return s.rankData(ordered, selected, orderParam.OrderCalculation), uint32(len(ordered)), nil
 }
 
-// GetNearbyFriendsRankingsAndCountByCategoryAndRankingOrderParam serves
-// RankingMode 3.
+
+
 func (s *Store) GetNearbyFriendsRankingsAndCountByCategoryAndRankingOrderParam(pid types.PID, category types.UInt32, orderParam rankingtypes.RankingOrderParam) (types.List[rankingtypes.RankingRankData], uint32, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -509,7 +509,7 @@ func (s *Store) GetNearbyFriendsRankingsAndCountByCategoryAndRankingOrderParam(p
 	return s.rankData(ordered, selected, orderParam.OrderCalculation), uint32(len(ordered)), nil
 }
 
-// GetOwnRankingByCategoryAndRankingOrderParam serves RankingMode 4.
+
 func (s *Store) GetOwnRankingByCategoryAndRankingOrderParam(pid types.PID, category types.UInt32, orderParam rankingtypes.RankingOrderParam) (types.List[rankingtypes.RankingRankData], uint32, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -527,8 +527,8 @@ func (s *Store) GetOwnRankingByCategoryAndRankingOrderParam(pid types.PID, categ
 	return s.rankData(ordered, own, orderParam.OrderCalculation), uint32(len(ordered)), nil
 }
 
-// RankingsForPIDs returns the ranks of a specific set of players, used by
-// GetRankingByPIDList.
+
+
 func (s *Store) RankingsForPIDs(pids []uint64, category uint32, orderParam rankingtypes.RankingOrderParam) (types.List[rankingtypes.RankingRankData], uint32) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -544,9 +544,9 @@ func (s *Store) RankingsForPIDs(pids []uint64, category uint32, orderParam ranki
 	return s.rankData(ordered, selected, orderParam.OrderCalculation), uint32(len(ordered))
 }
 
-// ApproximateOrder returns the rank a score would take in a category without
-// storing it, which is what a game shows as a projected position at the end of
-// a race before the player commits the time.
+
+
+
 func (s *Store) ApproximateOrder(category uint32, score uint32) uint32 {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -558,7 +558,7 @@ func (s *Store) ApproximateOrder(category uint32, score uint32) uint32 {
 		orderBy = ordered[0].OrderBy
 	}
 
-	// * The rank is one past however many existing scores beat this one.
+
 	order := uint32(1)
 	for _, entry := range ordered {
 		if betterThan(entry.Score, score, orderBy) {
@@ -569,8 +569,8 @@ func (s *Store) ApproximateOrder(category uint32, score uint32) uint32 {
 	return order
 }
 
-// friendSet returns a PID's friends as a lookup set, always including the PID
-// itself so a player can see their own entry on a friends board.
+
+
 func (s *Store) friendSet(pid types.PID) map[uint64]bool {
 	set := map[uint64]bool{uint64(pid): true}
 

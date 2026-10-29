@@ -12,7 +12,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/constants"
 )
 
-// PRUDPPacketV1 represents a PRUDPv1 packet
+
 type PRUDPPacketV1 struct {
 	PRUDPPacket
 	optionsLength               uint8
@@ -23,9 +23,9 @@ type PRUDPPacketV1 struct {
 	InitialUnreliableSequenceID uint16
 }
 
-// Copy copies the packet into a new PRUDPPacketV1
-//
-// Retains the same PRUDPConnection pointer
+
+
+
 func (p *PRUDPPacketV1) Copy() PRUDPPacketInterface {
 	copied, _ := NewPRUDPPacketV1(p.server, p.sender, nil)
 
@@ -67,12 +67,12 @@ func (p *PRUDPPacketV1) Copy() PRUDPPacketInterface {
 	return copied
 }
 
-// Version returns the packets PRUDP version
+
 func (p *PRUDPPacketV1) Version() int {
 	return 1
 }
 
-// decode parses the packets data
+
 func (p *PRUDPPacketV1) decode() error {
 	if p.readStream.Remaining() < 2 {
 		return errors.New("Failed to read PRUDPv1 magic. Not have enough data")
@@ -109,7 +109,7 @@ func (p *PRUDPPacketV1) decode() error {
 	return nil
 }
 
-// Bytes encodes a PRUDPv1 packet into a byte slice
+
 func (p *PRUDPPacketV1) Bytes() []byte {
 	options := p.encodeOptions()
 
@@ -175,7 +175,7 @@ func (p *PRUDPPacketV1) decodeHeader() error {
 
 	p.destinationVirtualPort = VirtualPort(destination)
 
-	// TODO - Does QRV also encode it this way in PRUDPv1?
+
 	typeAndFlags, err := p.readStream.ReadUInt16LE()
 	if err != nil {
 		return fmt.Errorf("Failed to read PRUDPv1 type and flags. %s", err.Error())
@@ -205,12 +205,12 @@ func (p *PRUDPPacketV1) decodeHeader() error {
 func (p *PRUDPPacketV1) encodeHeader() []byte {
 	stream := NewByteStreamOut(p.server.LibraryVersions, p.server.ByteStreamSettings)
 
-	stream.WriteUInt8(1) // * Version
+	stream.WriteUInt8(1)
 	stream.WriteUInt8(p.optionsLength)
 	stream.WriteUInt16LE(uint16(len(p.payload)))
 	stream.WriteUInt8(uint8(p.sourceVirtualPort))
 	stream.WriteUInt8(uint8(p.destinationVirtualPort))
-	stream.WriteUInt16LE(p.packetType | (p.flags << 4)) // TODO - Does QRV also encode it this way in PRUDPv1?
+	stream.WriteUInt16LE(p.packetType | (p.flags << 4))
 	stream.WriteUInt8(p.sessionID)
 	stream.WriteUInt8(p.substreamID)
 	stream.WriteUInt16LE(p.sequenceID)
@@ -232,7 +232,7 @@ func (p *PRUDPPacketV1) decodeOptions() error {
 			return err
 		}
 
-		_, err = optionsStream.ReadUInt8() // * Options size. We already know the size based on the ID, though
+		_, err = optionsStream.ReadUInt8()
 		if err != nil {
 			return err
 		}
@@ -270,9 +270,9 @@ func (p *PRUDPPacketV1) decodeOptions() error {
 			}
 		}
 
-		// * Only one option is processed at a time, so we can
-		// * just check for errors here rather than after EVERY
-		// * read
+
+
+
 		if err != nil {
 			return err
 		}
@@ -294,25 +294,25 @@ func (p *PRUDPPacketV1) encodeOptions() []byte {
 		optionsStream.Grow(16)
 		optionsStream.WriteBytesNext(p.connectionSignature)
 
-		// * Encoded here for NintendoClients compatibility.
-		// * The order of these options should not matter,
-		// * however when NintendoClients calculates the
-		// * signature it does NOT use the original options
-		// * section, and instead re-encodes the data in a
-		// * specific order. Due to how this section is
-		// * parsed, though, order REALLY doesn't matter.
-		// * NintendoClients expects option 3 before 4, though
+
+
+
+
+
+
+
+
 		if p.packetType == constants.ConnectPacket {
 			optionsStream.WriteUInt8(3)
 			optionsStream.WriteUInt8(2)
 			optionsStream.WriteUInt16LE(p.InitialUnreliableSequenceID)
 		}
 
-		// Some early Wii U PRUDP v1 clients omit option 4 from CONNECT
-		// when the negotiated maximum substream ID is zero. They reject a
-		// CONNECT/ACK which adds that option back. SYN packets must always
-		// advertise the option, while CONNECT packets only need it for a
-		// non-zero negotiated value.
+
+
+
+
+
 		if p.packetType == constants.SynPacket || p.MaximumSubstreamID != 0 {
 			optionsStream.WriteUInt8(4)
 			optionsStream.WriteUInt8(1)
@@ -337,7 +337,7 @@ func (p *PRUDPPacketV1) CalculateSignature(sessionKey, connectionSignature []byt
 	return p.server.PRUDPV1Settings.SignatureCalculator(p, sessionKey, connectionSignature)
 }
 
-// NewPRUDPPacketV1 creates and returns a new PacketV1 using the provided Client and stream
+
 func NewPRUDPPacketV1(server *PRUDPServer, connection *PRUDPConnection, readStream *ByteStreamIn) (*PRUDPPacketV1, error) {
 	packet := &PRUDPPacketV1{
 		PRUDPPacket: PRUDPPacket{
@@ -359,7 +359,7 @@ func NewPRUDPPacketV1(server *PRUDPServer, connection *PRUDPConnection, readStre
 	return packet, nil
 }
 
-// NewPRUDPPacketsV1 reads all possible PRUDPv1 packets from the stream
+
 func NewPRUDPPacketsV1(server *PRUDPServer, connection *PRUDPConnection, readStream *ByteStreamIn) ([]PRUDPPacketInterface, error) {
 	packets := make([]PRUDPPacketInterface, 0)
 

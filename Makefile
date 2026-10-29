@@ -13,8 +13,6 @@ run:
 test:
 	go test ./...
 
-# Requires the Python environment described in README.md, and a server already
-# listening on the configured ports.
 e2e:
 	python tests/e2e_test.py
 

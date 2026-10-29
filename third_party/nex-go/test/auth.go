@@ -1,4 +1,4 @@
-// Package main implements a test server
+
 package main
 
 import (
@@ -32,7 +32,7 @@ func startAuthenticationServer() {
 
 			fmt.Println("[AUTH]", request.ProtocolID, request.MethodID)
 
-			if request.ProtocolID == 0xA { // * Ticket Granting
+			if request.ProtocolID == 0xA {
 				if request.MethodID == 0x1 {
 					login(packet)
 				}

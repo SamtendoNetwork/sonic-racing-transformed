@@ -8,10 +8,10 @@ import (
 	notificationsconstants "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/constants"
 )
 
-// * MatchMakingExt (0x32) is a small extension protocol with six methods. The
-// * important one is GetParticipantsURLs: it is how a console learns where its
-// * opponents actually are on the network, which is what lets the race itself
-// * run peer to peer while this server only brokers the lobby.
+
+
+
+
 
 func (p *Protocol) registerMatchMakingExt(protocol *matchmakingext.Protocol) {
 	protocol.SetHandlerEndParticipation(p.endParticipation)
@@ -21,9 +21,9 @@ func (p *Protocol) registerMatchMakingExt(protocol *matchmakingext.Protocol) {
 	protocol.SetHandlerDeleteFromDeletions(p.extDeleteFromDeletions)
 }
 
-// endParticipation leaves a gathering gracefully.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) endParticipation(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, strMessage types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -55,13 +55,13 @@ func (p *Protocol) endParticipation(err error, packet nex.PacketInterface, callI
 	return respond(endpoint, matchmakingext.ProtocolID, matchmakingext.MethodEndParticipation, callID, stream.Bytes()), nil
 }
 
-// extGetParticipants lists the PIDs in a gathering.
-//
-// bOnlyActive would exclude participants who have left but not been reaped.
-// This store removes participants immediately, so every stored participant is
-// active and the flag makes no difference.
-//
-// Response: List<PID> participants.
+
+
+
+
+
+
+
 func (p *Protocol) extGetParticipants(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, bOnlyActive types.Bool) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -85,9 +85,9 @@ func (p *Protocol) extGetParticipants(err error, packet nex.PacketInterface, cal
 	return respond(endpoint, matchmakingext.ProtocolID, matchmakingext.MethodGetParticipants, callID, stream.Bytes()), nil
 }
 
-// extGetDetailedParticipants lists the participants with their details.
-//
-// Response: List<ParticipantDetails> details.
+
+
+
 func (p *Protocol) extGetDetailedParticipants(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, bOnlyActive types.Bool) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -111,19 +111,19 @@ func (p *Protocol) extGetDetailedParticipants(err error, packet nex.PacketInterf
 	return respond(endpoint, matchmakingext.ProtocolID, matchmakingext.MethodGetDetailedParticipants, callID, stream.Bytes()), nil
 }
 
-// extGetParticipantsURLs returns, for each requested gathering, the station
-// URLs of everyone in it.
-//
-// This is the peer to peer handshake. The station URLs were registered by each
-// console through SecureConnection::RegisterEx, where nex-go replaced the
-// client-claimed public address with the address the packet actually arrived
-// from - so what the game receives here is the reflected, NAT-correct address
-// of every other racer.
-//
-// A gathering the caller is not part of is skipped rather than rejected, so one
-// bad ID cannot break a batched lookup.
-//
-// Response: List<GatheringURLs> urls.
+
+
+
+
+
+
+
+
+
+
+
+
+
 func (p *Protocol) extGetParticipantsURLs(err error, packet nex.PacketInterface, callID uint32, lstGatherings types.List[types.UInt32]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -160,13 +160,13 @@ func (p *Protocol) extGetParticipantsURLs(err error, packet nex.PacketInterface,
 	return respond(endpoint, matchmakingext.ProtocolID, matchmakingext.MethodGetParticipantsURLs, callID, stream.Bytes()), nil
 }
 
-// extDeleteFromDeletions acknowledges gatherings the client saw disappear.
-//
-// This server destroys gatherings outright instead of keeping a pending
-// deletions list, so there is nothing to clear - but the call must still
-// succeed, since a client that gets an error here can stall.
-//
-// Response: no return values.
+
+
+
+
+
+
+
 func (p *Protocol) extDeleteFromDeletions(err error, packet nex.PacketInterface, callID uint32, lstDeletions types.List[types.UInt32], pid types.PID) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)

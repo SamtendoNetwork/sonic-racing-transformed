@@ -28,7 +28,7 @@ func (commonProtocol *CommonProtocol) getNumberOfMessages(err error, packet nex.
 
 	recipientID, recipientType := common_globals.GetMessageRecipientData(libraryVersion, recipient)
 
-	// * If the MessageRecipient is invalid, just return 0
+
 	if valid := commonProtocol.manager.ValidateMessageRecipient(commonProtocol.manager, connection.PID(), recipientID, recipientType); valid {
 		uiNbMessages, nexError = messaging_database.GetNumberOfMessages(commonProtocol.manager, recipientID, recipientType)
 		if nexError != nil {

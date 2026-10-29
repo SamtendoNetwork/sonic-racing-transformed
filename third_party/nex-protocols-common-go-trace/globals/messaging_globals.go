@@ -10,7 +10,7 @@ import (
 	messaging_types "github.com/PretendoNetwork/nex-protocols-go/v2/messaging/types"
 )
 
-// MessagingManager manages messaging communications
+
 type MessagingManager struct {
 	Database *sql.DB
 	Endpoint *nex.PRUDPEndPoint
@@ -24,7 +24,7 @@ type MessagingManager struct {
 	RetrieveDetailedMessage  func(manager *MessagingManager, messageHeader messaging_types.UserMessage, messageType string) (types.DataHolder, *nex.Error)
 }
 
-// ValidateUserMessage checks if a UserMessage is valid, and returns its validity and the recipient information of the message
+
 func (mm *MessagingManager) ValidateUserMessage(userMessage messaging_types.UserMessage) (types.UInt64, messaging_constants.RecipientType, *nex.Error) {
 	if utf8.RuneCountInString(string(userMessage.StrSubject)) > 256 {
 		return 0, 0, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "Message subject is too long")
@@ -34,7 +34,7 @@ func (mm *MessagingManager) ValidateUserMessage(userMessage messaging_types.User
 	return recipientID, recipientType, nil
 }
 
-// ValidateTextMessage checks if a TextMessage is valid, and returns its validity and the recipient information of the message
+
 func (mm *MessagingManager) ValidateTextMessage(textMessage messaging_types.TextMessage) (types.UInt64, messaging_constants.RecipientType, *nex.Error) {
 	recipientID, recipientType, nexError := mm.ValidateUserMessage(textMessage.UserMessage)
 	if nexError != nil {
@@ -48,7 +48,7 @@ func (mm *MessagingManager) ValidateTextMessage(textMessage messaging_types.Text
 	return recipientID, recipientType, nil
 }
 
-// ValidateBinaryMessage checks if a BinaryMessage is valid, and returns its validity and the recipient information of the message
+
 func (mm *MessagingManager) ValidateBinaryMessage(binaryMessage messaging_types.BinaryMessage) (types.UInt64, messaging_constants.RecipientType, *nex.Error) {
 	recipientID, recipientType, nexError := mm.ValidateUserMessage(binaryMessage.UserMessage)
 	if nexError != nil {
@@ -62,7 +62,7 @@ func (mm *MessagingManager) ValidateBinaryMessage(binaryMessage messaging_types.
 	return recipientID, recipientType, nil
 }
 
-// DefaultValidateMessage is the default handler of MessagingManager to validate an input message holder
+
 func (mm *MessagingManager) DefaultValidateMessage(message types.DataHolder) (types.UInt64, messaging_constants.RecipientType, *nex.Error) {
 	messageObjectID := message.Object.ObjectID()
 	if messageObjectID.Equals(types.NewString("TextMessage")) {
@@ -74,7 +74,7 @@ func (mm *MessagingManager) DefaultValidateMessage(message types.DataHolder) (ty
 	return 0, 0, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "Invalid data holder object ID")
 }
 
-// DefaultGetMessageHeader is the default handler for GetMessageHeader
+
 func (mm *MessagingManager) DefaultGetMessageHeader(message types.DataHolder) (messaging_types.UserMessage, *nex.Error) {
 	messageObjectID := message.Object.ObjectID()
 	if messageObjectID.Equals(types.NewString("TextMessage")) {
@@ -86,7 +86,7 @@ func (mm *MessagingManager) DefaultGetMessageHeader(message types.DataHolder) (m
 	return messaging_types.UserMessage{}, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "Invalid data holder object ID")
 }
 
-// DefaultSetMessageHeader is the default handler for SetMessageHeader
+
 func (mm *MessagingManager) DefaultSetMessageHeader(message types.DataHolder, header messaging_types.UserMessage) (types.DataHolder, *nex.Error) {
 	messageObjectID := message.Object.ObjectID()
 	if messageObjectID.Equals(types.NewString("TextMessage")) {
@@ -104,7 +104,7 @@ func (mm *MessagingManager) DefaultSetMessageHeader(message types.DataHolder, he
 	return message, nil
 }
 
-// PrepareMessage populates the required missing fields of the message
+
 func (mm *MessagingManager) PrepareMessage(senderPID types.PID, message types.DataHolder) (types.DataHolder, *nex.Error) {
 	messageHeader, nexError := mm.GetMessageHeader(message)
 	if nexError != nil {
@@ -116,7 +116,7 @@ func (mm *MessagingManager) PrepareMessage(senderPID types.PID, message types.Da
 		return message, nexError
 	}
 
-	// * The message subject is capped to 60 characters
+
 	if utf8.RuneCountInString(string(messageHeader.StrSubject)) > 60 {
 		messageHeader.StrSubject = types.String(ResizeString(string(messageHeader.StrSubject), 60))
 	}
@@ -133,7 +133,7 @@ func (mm *MessagingManager) PrepareMessage(senderPID types.PID, message types.Da
 	return message, nil
 }
 
-// NewMessagingManager returns a new MessagingManager
+
 func NewMessagingManager(endpoint *nex.PRUDPEndPoint, db *sql.DB) *MessagingManager {
 	mm := &MessagingManager{
 		Endpoint: endpoint,

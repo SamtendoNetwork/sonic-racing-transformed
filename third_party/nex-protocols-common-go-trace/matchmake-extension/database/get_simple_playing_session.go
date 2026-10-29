@@ -9,7 +9,7 @@ import (
 	match_making_types "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 )
 
-// GetSimplePlayingSession returns the simple playing sessions of the given PIDs
+
 func GetSimplePlayingSession(manager *common_globals.MatchmakingManager, listPID []types.PID) ([]match_making_types.SimplePlayingSession, *nex.Error) {
 	simplePlayingSessions := make([]match_making_types.SimplePlayingSession, 0)
 	for _, pid := range listPID {

@@ -15,7 +15,7 @@ func (commonProtocol *CommonProtocol) getPlayingSession(err error, packet nex.Pa
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
 	}
 
-	if len(lstPID) > 300 { // * MAX_PRINCIPALID_SIZE_TO_FIND_MATCHMAKE_SESSION
+	if len(lstPID) > 300 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "lstPID is bigger than MAX_PRINCIPALID_SIZE_TO_FIND_MATCHMAKE_SESSION")
 	}
 

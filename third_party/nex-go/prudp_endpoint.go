@@ -11,13 +11,13 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// PRUDPEndPoint is an implementation of rdv::PRUDPEndPoint.
-// A PRUDPEndPoint represents a remote server location the client may connect to using a given remote stream ID.
-// Each PRUDPEndPoint handles it's own set of PRUDPConnections, state, and events.
-//
-// In NEX there exists nn::nex::SecureEndPoint, which presumably is what differentiates between the authentication
-// and secure servers. However the functionality of rdv::PRUDPEndPoint and nn::nex::SecureEndPoint is seemingly
-// identical. Rather than duplicate the logic from PRUDPEndpoint, a IsSecureEndpoint flag has been added instead.
+
+
+
+
+
+
+
 type PRUDPEndPoint struct {
 	Server                            *PRUDPServer
 	StreamID                          uint8
@@ -35,44 +35,44 @@ type PRUDPEndPoint struct {
 	CalcRetransmissionTimeoutCallback CalcRetransmissionTimeoutCallback
 }
 
-// CalcRetransmissionTimeoutCallback is an optional callback which can be used to override the RTO calculation
-// for packets sent by this `PRUDPEndpoint`
+
+
 type CalcRetransmissionTimeoutCallback func(rtt float64, sendCount uint32) time.Duration
 
-// RegisterServiceProtocol registers a NEX service with the endpoint
+
 func (pep *PRUDPEndPoint) RegisterServiceProtocol(protocol ServiceProtocol) {
 	protocol.SetEndpoint(pep)
 	pep.OnData(protocol.HandlePacket)
 }
 
-// RegisterCustomPacketHandler registers a custom handler for a given packet type. Used to override existing handlers or create new ones for custom packet types.
+
 func (pep *PRUDPEndPoint) RegisterCustomPacketHandler(packetType uint16, handler func(pep *PRUDPEndPoint, packet PRUDPPacketInterface)) {
 	pep.packetHandlers[packetType] = handler
 }
 
-// OnData adds an event handler which is fired when a new DATA packet is received
+
 func (pep *PRUDPEndPoint) OnData(handler func(packet PacketInterface)) {
 	pep.on("data", handler)
 }
 
-// OnError adds an event handler which is fired when an error occurs on the endpoint
+
 func (pep *PRUDPEndPoint) OnError(handler func(err *Error)) {
-	// * "Ended" events are a special case, so handle them separately
+
 	pep.errorEventHandlers = append(pep.errorEventHandlers, handler)
 }
 
-// OnDisconnect adds an event handler which is fired when a new DISCONNECT packet is received
-//
-// To handle a connection being removed from the server, see OnConnectionEnded which fires on more cases
+
+
+
 func (pep *PRUDPEndPoint) OnDisconnect(handler func(packet PacketInterface)) {
 	pep.on("disconnect", handler)
 }
 
-// OnConnectionEnded adds an event handler which is fired when a connection is removed from the server
-//
-// Fires both on a natural disconnect and from a timeout
+
+
+
 func (pep *PRUDPEndPoint) OnConnectionEnded(handler func(connection *PRUDPConnection)) {
-	// * "Ended" events are a special case, so handle them separately
+
 	pep.connectionEndedEventHandlers = append(pep.connectionEndedEventHandlers, handler)
 }
 
@@ -84,7 +84,7 @@ func (pep *PRUDPEndPoint) on(name string, handler func(packet PacketInterface)) 
 	pep.packetEventHandlers[name] = append(pep.packetEventHandlers[name], handler)
 }
 
-// Emit calls the registered packet event handler.
+
 func (pep *PRUDPEndPoint) Emit(name string, packet PRUDPPacketInterface) {
 	if handlers, ok := pep.packetEventHandlers[name]; ok {
 		for _, handler := range handlers {
@@ -99,15 +99,15 @@ func (pep *PRUDPEndPoint) emitConnectionEnded(connection *PRUDPConnection) {
 	}
 }
 
-// EmitError calls all the endpoints error event handlers with the provided error
+
 func (pep *PRUDPEndPoint) EmitError(err *Error) {
 	for _, handler := range pep.errorEventHandlers {
 		handler(err)
 	}
 }
 
-// CleanupConnection cleans up and deletes a connection from this endpoint. Will lock the Connections mutex - make sure
-// you don't hold it during a call, or this will deadlock
+
+
 func (pep *PRUDPEndPoint) CleanupConnection(connection *PRUDPConnection) {
 	discriminator := fmt.Sprintf("%s-%d-%d", connection.Socket.Address.String(), connection.StreamType, connection.StreamID)
 
@@ -116,13 +116,13 @@ func (pep *PRUDPEndPoint) CleanupConnection(connection *PRUDPConnection) {
 		found = true
 	})
 
-	// * Probably this connection is on a different PRUDPEndPoint
+
 	if !found {
 		logger.Warningf("Tried to delete connection %v (ID %v) but it doesn't exist!", discriminator, connection.ID)
 	}
 
-	// * We can't do this during RunAndDelete, since we hold the Connections mutex then
-	// * This way we avoid any recursive locking
+
+
 	connection.cleanup()
 }
 
@@ -194,8 +194,8 @@ func (pep *PRUDPEndPoint) handleMultiAcknowledgment(packet PRUDPPacketInterface)
 	var slidingWindow *SlidingWindow
 
 	if packet.SubstreamID() == 1 || packet.Version() == 2 {
-		// * New aggregate acknowledgment packets set this to 1
-		// * and encode the real substream ID in in the payload
+
+
 		substreamID, _ := stream.ReadUInt8()
 		additionalIDsCount, _ := stream.ReadUInt8()
 		baseSequenceID, _ = stream.ReadUInt16LE()
@@ -206,9 +206,9 @@ func (pep *PRUDPEndPoint) handleMultiAcknowledgment(packet PRUDPPacketInterface)
 			sequenceIDs = append(sequenceIDs, additionalID)
 		}
 	} else {
-		// TODO - This is how Kinnay's client handles this, but it doesn't make sense for QRV? Since it can have multiple reliable substreams?
-		// * Old aggregate acknowledgment packets always use
-		// * substream 0
+
+
+
 		slidingWindow = connection.SlidingWindow(0)
 		baseSequenceID = packet.SequenceID()
 
@@ -218,8 +218,8 @@ func (pep *PRUDPEndPoint) handleMultiAcknowledgment(packet PRUDPPacketInterface)
 		}
 	}
 
-	// * MutexMap.Each locks the mutex, can't remove while reading.
-	// * Have to just loop again
+
+
 	slidingWindow.TimeoutManager.packets.Each(func(sequenceID uint16, pending PRUDPPacketInterface) bool {
 		if sequenceID <= baseSequenceID && !slices.Contains(sequenceIDs, sequenceID) {
 			sequenceIDs = append(sequenceIDs, sequenceID)
@@ -228,7 +228,7 @@ func (pep *PRUDPEndPoint) handleMultiAcknowledgment(packet PRUDPPacketInterface)
 		return false
 	})
 
-	// * Actually remove the packets from the pool
+
 	for _, sequenceID := range sequenceIDs {
 		slidingWindow.TimeoutManager.AcknowledgePacket(sequenceID)
 	}
@@ -266,9 +266,9 @@ func (pep *PRUDPEndPoint) handleSyn(packet PRUDPPacketInterface) {
 	ack.SetConnectionSignature(connectionSignature)
 
 	if ack, ok := ack.(*PRUDPPacketV1); ok {
-		// * Negotiate with the client what we support
-		ack.MaximumSubstreamID = packet.(*PRUDPPacketV1).MaximumSubstreamID // * No change needed, we can just support what the client wants
-		ack.MinorVersion = packet.(*PRUDPPacketV1).MinorVersion             // * No change needed, we can just support what the client wants
+
+		ack.MaximumSubstreamID = packet.(*PRUDPPacketV1).MaximumSubstreamID
+		ack.MinorVersion = packet.(*PRUDPPacketV1).MinorVersion
 		ack.SupportedFunctions = pep.Server.SupportedFunctions & packet.(*PRUDPPacketV1).SupportedFunctions
 	}
 
@@ -322,10 +322,10 @@ func (pep *PRUDPEndPoint) handleConnect(packet PRUDPPacketInterface) {
 	ack.SetSequenceID(1)
 
 	if ack, ok := ack.(*PRUDPPacketV1); ok {
-		// * At this stage the client and server have already
-		// * negotiated what they each can support, so configure
-		// * the client now and just send the client back the
-		// * negotiated configuration
+
+
+
+
 		ack.MaximumSubstreamID = packet.(*PRUDPPacketV1).MaximumSubstreamID
 		ack.MinorVersion = packet.(*PRUDPPacketV1).MinorVersion
 		ack.SupportedFunctions = packet.(*PRUDPPacketV1).SupportedFunctions
@@ -429,7 +429,7 @@ func (pep *PRUDPEndPoint) handleData(packet PRUDPPacketInterface) {
 }
 
 func (pep *PRUDPEndPoint) handleDisconnect(packet PRUDPPacketInterface) {
-	// TODO - Should we check the state here, or just let the connection disconnect at any time?
+
 
 	if packet.HasFlag(constants.PacketFlagNeedsAck) {
 		pep.AcknowledgePacket(packet)
@@ -465,7 +465,7 @@ func (pep *PRUDPEndPoint) handlePing(packet PRUDPPacketInterface) {
 	}
 }
 
-// ReadKerberosTicket decrypts and parses Kerberos ticket obtained from CONNECT packet.
+
 func (pep *PRUDPEndPoint) ReadKerberosTicket(payload []byte) ([]byte, types.PID, uint32, error) {
 	stream := NewByteStreamIn(payload, pep.Server.LibraryVersions, pep.ByteStreamSettings())
 
@@ -479,7 +479,7 @@ func (pep *PRUDPEndPoint) ReadKerberosTicket(payload []byte) ([]byte, types.PID,
 		return nil, 0, 0, err
 	}
 
-	// * Sanity checks
+
 	serverAccount, _ := pep.AccountDetailsByUsername(pep.ServerAccount.Username)
 	if serverAccount == nil {
 		return nil, 0, 0, errors.New("Failed to find endpoint server account")
@@ -523,7 +523,7 @@ func (pep *PRUDPEndPoint) ReadKerberosTicket(payload []byte) ([]byte, types.PID,
 		return nil, 0, 0, errors.New("User PID and ticket source PID mismatch")
 	}
 
-	_, err = checkDataStream.ReadUInt32LE() // * CID of secure server station url
+	_, err = checkDataStream.ReadUInt32LE()
 	if err != nil {
 		return nil, 0, 0, err
 	}
@@ -559,14 +559,14 @@ func (pep *PRUDPEndPoint) AcknowledgePacket(packet PRUDPPacketInterface) {
 
 	pep.Server.sendPacket(ack)
 
-	// * Servers send the DISCONNECT ACK 3 times
+
 	if packet.Type() == constants.DisconnectPacket {
 		pep.Server.sendPacket(ack)
 		pep.Server.sendPacket(ack)
 	}
 }
 
-// HandleReliable handles reliable PRUDP DATA packets.
+
 func (pep *PRUDPEndPoint) HandleReliable(packet PRUDPPacketInterface) {
 	if packet.HasFlag(constants.PacketFlagNeedsAck) {
 		pep.AcknowledgePacket(packet)
@@ -586,7 +586,7 @@ func (pep *PRUDPEndPoint) HandleReliable(packet PRUDPPacketInterface) {
 			if nextPacket.Version() != 2 {
 				decryptedPayload = nextPacket.decryptPayload()
 			} else {
-				// * PRUDPLite does not encrypt payloads
+
 				decryptedPayload = nextPacket.Payload()
 			}
 
@@ -603,7 +603,7 @@ func (pep *PRUDPEndPoint) HandleReliable(packet PRUDPPacketInterface) {
 				message := NewRMCMessage(pep)
 				err := message.FromBytes(incomingFragmentBuffer)
 				if err != nil {
-					// TODO - Should this return the error too?
+
 					logger.Error(err.Error())
 				}
 
@@ -618,49 +618,49 @@ func (pep *PRUDPEndPoint) HandleReliable(packet PRUDPPacketInterface) {
 	}
 }
 
-// HandleUnreliable handles unreliable PRUDP DATA packets.
+
 func (pep *PRUDPEndPoint) HandleUnreliable(packet PRUDPPacketInterface) {
 	if packet.HasFlag(constants.PacketFlagNeedsAck) {
 		pep.AcknowledgePacket(packet)
 	}
 
-	// * Since unreliable DATA packets can in theory reach the
-	// * server in any order, and they lack a subsslidingWindowtream, it's
-	// * not actually possible to know what order they should
-	// * be processed in for each request. So assume all packets
-	// * MUST be fragment 0 (unreliable packets do not have frags)
-	// *
-	// * Example -
-	// *
-	// * Say there is 2 requests to the same protocol, methods 1
-	// * and 2. The starting unreliable sequence ID is 10. If both
-	// * method 1 and 2 are called at the same time, but method 1
-	// * has a fragmented payload, the packets could, in theory, reach
-	// * the server like so:
-	// *
-	// *	- Method1 - Sequence 10, Fragment 1
-	// *	- Method1 - Sequence 13, Fragment 3
-	// *	- Method2 - Sequence 12, Fragment 0
-	// *	- Method1 - Sequence 11, Fragment 2
-	// *	- Method1 - Sequence 14, Fragment 0
-	// *
-	// * If we reorder these to the proper order, like so:
-	// *
-	// *	- Method1 - Sequence 10, Fragment 1
-	// *	- Method1 - Sequence 11, Fragment 2
-	// *	- Method2 - Sequence 12, Fragment 0
-	// *	- Method1 - Sequence 13, Fragment 3
-	// *	- Method1 - Sequence 14, Fragment 0
-	// *
-	// * We still have a gap where Method2 was called. It's not
-	// * possible to know if the packet with sequence ID 12 belongs
-	// * to the Method1 calls or not. We don't even know which methods
-	// * the packets are for at this stage yet, since the RMC data
-	// * can't be checked until all the fragments are collected and
-	// * the payload decrypted. In this case, we would see fragment 0
-	// * and assume that's the end of fragments, losing the real last
-	// * fragments and resulting in a bad decryption
-	// TODO - Is this actually true? I'm just assuming, based on common sense, tbh. Kinnay also does not implement fragmented unreliable packets?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	if packet.getFragmentID() != 0 {
 		logger.Warningf("Unexpected unreliable fragment ID. Expected 0, got %d", packet.getFragmentID())
 		return
@@ -671,7 +671,7 @@ func (pep *PRUDPEndPoint) HandleUnreliable(packet PRUDPPacketInterface) {
 	message := NewRMCMessage(pep)
 	err := message.FromBytes(payload)
 	if err != nil {
-		// TODO - Should this return the error too?
+
 		logger.Error(err.Error())
 	}
 
@@ -703,7 +703,7 @@ func (pep *PRUDPEndPoint) sendPing(connection *PRUDPConnection) {
 	pep.Server.sendPacket(ping)
 }
 
-// FindConnectionByID returns the PRUDP client connected with the given connection ID
+
 func (pep *PRUDPEndPoint) FindConnectionByID(connectedID uint32) *PRUDPConnection {
 	var connection *PRUDPConnection
 
@@ -719,7 +719,7 @@ func (pep *PRUDPEndPoint) FindConnectionByID(connectedID uint32) *PRUDPConnectio
 	return connection
 }
 
-// FindConnectionByPID returns the PRUDP client connected with the given PID
+
 func (pep *PRUDPEndPoint) FindConnectionByPID(pid uint64) *PRUDPConnection {
 	var connection *PRUDPConnection
 
@@ -735,7 +735,7 @@ func (pep *PRUDPEndPoint) FindConnectionByPID(pid uint64) *PRUDPConnection {
 	return connection
 }
 
-// ComputeRetransmitTimeout computes the RTO (Retransmit timeout) for a given packet
+
 func (pep *PRUDPEndPoint) ComputeRetransmitTimeout(packet PRUDPPacketInterface) time.Duration {
 	connection := packet.Sender().(*PRUDPConnection)
 	rtt := connection.rtt
@@ -768,47 +768,47 @@ func (pep *PRUDPEndPoint) ComputeRetransmitTimeout(packet PRUDPPacketInterface) 
 	return time.Duration(float64(retransmitTimeBase*int64(retransmitTimeBaseMultiplier))*retransmitMultiplier) * time.Millisecond
 }
 
-// AccessKey returns the servers sandbox access key
+
 func (pep *PRUDPEndPoint) AccessKey() string {
 	return pep.Server.AccessKey
 }
 
-// SetAccessKey sets the servers sandbox access key
+
 func (pep *PRUDPEndPoint) SetAccessKey(accessKey string) {
 	pep.Server.AccessKey = accessKey
 }
 
-// Send sends the packet to the packets sender
+
 func (pep *PRUDPEndPoint) Send(packet PacketInterface) {
 	pep.Server.Send(packet)
 }
 
-// LibraryVersions returns the versions that the server has
+
 func (pep *PRUDPEndPoint) LibraryVersions() *LibraryVersions {
 	return pep.Server.LibraryVersions
 }
 
-// ByteStreamSettings returns the settings to be used for ByteStreams
+
 func (pep *PRUDPEndPoint) ByteStreamSettings() *ByteStreamSettings {
 	return pep.Server.ByteStreamSettings
 }
 
-// SetByteStreamSettings sets the settings to be used for ByteStreams
+
 func (pep *PRUDPEndPoint) SetByteStreamSettings(byteStreamSettings *ByteStreamSettings) {
 	pep.Server.ByteStreamSettings = byteStreamSettings
 }
 
-// UseVerboseRMC checks whether or not the endpoint uses verbose RMC
+
 func (pep *PRUDPEndPoint) UseVerboseRMC() bool {
 	return pep.Server.UseVerboseRMC
 }
 
-// EnableVerboseRMC enable or disables the use of verbose RMC
+
 func (pep *PRUDPEndPoint) EnableVerboseRMC(enable bool) {
 	pep.Server.UseVerboseRMC = enable
 }
 
-// NewPRUDPEndPoint returns a new PRUDPEndPoint for a server on the provided stream ID
+
 func NewPRUDPEndPoint(streamID uint8) *PRUDPEndPoint {
 	pep := &PRUDPEndPoint{
 		StreamID:                     streamID,

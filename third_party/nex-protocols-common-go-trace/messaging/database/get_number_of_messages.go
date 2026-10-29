@@ -8,7 +8,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// GetNumberOfMessages gets the number of messages available for the given recipient
+
 func GetNumberOfMessages(manager *common_globals.MessagingManager, recipientID types.UInt64, recipientType messaging_constants.RecipientType) (types.UInt32, *nex.Error) {
 	var err error
 	var uiNbMessages types.UInt32

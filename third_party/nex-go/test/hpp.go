@@ -9,7 +9,7 @@ import (
 
 var hppServer *nex.HPPServer
 
-// * Took these structs out of the protocols lib for convenience
+
 
 type dataStoreGetNotificationURLParam struct {
 	types.Structure
@@ -69,7 +69,7 @@ func startHPPServer() {
 
 			fmt.Println("[HPP]", request.ProtocolID, request.MethodID)
 
-			if request.ProtocolID == 0x73 { // * DataStore
+			if request.ProtocolID == 0x73 {
 				if request.MethodID == 0xD {
 					getNotificationURL(packet)
 				}
@@ -121,7 +121,7 @@ func getNotificationURL(packet *nex.HPPPacket) {
 	response.MethodID = request.MethodID
 	response.Parameters = responseStream.Bytes()
 
-	// * We replace the RMC message so that it can be delivered back
+
 	packet.SetRMCMessage(response)
 
 	hppServer.Send(packet)

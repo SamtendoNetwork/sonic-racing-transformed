@@ -11,12 +11,12 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// KerberosEncryption is a struct representing a Kerberos encryption utility
+
 type KerberosEncryption struct {
 	key []byte
 }
 
-// Validate checks the integrity of the given buffer by verifying the HMAC checksum
+
 func (ke *KerberosEncryption) Validate(buffer []byte) bool {
 	data := buffer[:len(buffer)-0x10]
 	checksum := buffer[len(buffer)-0x10:]
@@ -27,7 +27,7 @@ func (ke *KerberosEncryption) Validate(buffer []byte) bool {
 	return hmac.Equal(checksum, mac.Sum(nil))
 }
 
-// Decrypt decrypts the provided buffer if it passes the integrity check
+
 func (ke *KerberosEncryption) Decrypt(buffer []byte) ([]byte, error) {
 	if !ke.Validate(buffer) {
 		return nil, errors.New("Invalid Kerberos checksum (incorrect password)")
@@ -45,7 +45,7 @@ func (ke *KerberosEncryption) Decrypt(buffer []byte) ([]byte, error) {
 	return decrypted, nil
 }
 
-// Encrypt encrypts the given buffer and appends an HMAC checksum for integrity
+
 func (ke *KerberosEncryption) Encrypt(buffer []byte) []byte {
 	cipher, _ := rc4.NewCipher(ke.key)
 	encrypted := make([]byte, len(buffer))
@@ -61,19 +61,19 @@ func (ke *KerberosEncryption) Encrypt(buffer []byte) []byte {
 	return append(encrypted, checksum...)
 }
 
-// NewKerberosEncryption creates a new KerberosEncryption instance with the given key.
+
 func NewKerberosEncryption(key []byte) *KerberosEncryption {
 	return &KerberosEncryption{key: key}
 }
 
-// KerberosTicket represents a ticket granting a user access to a secure server
+
 type KerberosTicket struct {
 	SessionKey   []byte
 	TargetPID    types.PID
 	InternalData types.Buffer
 }
 
-// Encrypt writes the ticket data to the provided stream and returns the encrypted byte slice
+
 func (kt *KerberosTicket) Encrypt(key []byte, stream *ByteStreamOut) ([]byte, error) {
 	encryption := NewKerberosEncryption(key)
 
@@ -86,20 +86,20 @@ func (kt *KerberosTicket) Encrypt(key []byte, stream *ByteStreamOut) ([]byte, er
 	return encryption.Encrypt(stream.Bytes()), nil
 }
 
-// NewKerberosTicket returns a new Ticket instance
+
 func NewKerberosTicket() *KerberosTicket {
 	return &KerberosTicket{}
 }
 
-// KerberosTicketInternalData holds the internal data for a kerberos ticket to be processed by the server
+
 type KerberosTicketInternalData struct {
-	Server     *PRUDPServer // TODO - Remove this dependency and make a settings struct
+	Server     *PRUDPServer
 	Issued     types.DateTime
 	SourcePID  types.PID
 	SessionKey []byte
 }
 
-// Encrypt writes the ticket data to the provided stream and returns the encrypted byte slice
+
 func (ti *KerberosTicketInternalData) Encrypt(key []byte, stream *ByteStreamOut) ([]byte, error) {
 	ti.Issued.WriteTo(stream)
 	ti.SourcePID.WriteTo(stream)
@@ -139,7 +139,7 @@ func (ti *KerberosTicketInternalData) Encrypt(key []byte, stream *ByteStreamOut)
 	return encryption.Encrypt(data), nil
 }
 
-// Decrypt decrypts the given data and populates the struct
+
 func (ti *KerberosTicketInternalData) Decrypt(stream *ByteStreamIn, key []byte) error {
 	if ti.Server.KerberosTicketVersion == 1 {
 		ticketKey := types.NewBuffer(nil)
@@ -184,12 +184,12 @@ func (ti *KerberosTicketInternalData) Decrypt(stream *ByteStreamIn, key []byte) 
 	return nil
 }
 
-// NewKerberosTicketInternalData returns a new KerberosTicketInternalData instance
+
 func NewKerberosTicketInternalData(server *PRUDPServer) *KerberosTicketInternalData {
 	return &KerberosTicketInternalData{Server: server}
 }
 
-// DeriveKerberosKey derives a users kerberos encryption key based on their PID and password
+
 func DeriveKerberosKey(pid types.PID, password []byte) []byte {
 	iterationCount := int(65000 + pid%1024)
 	key := password

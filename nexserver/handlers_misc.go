@@ -12,9 +12,9 @@ import (
 	"github.com/nex-server/sonic-transformed/globals"
 )
 
-// observedAddress returns the address a connection's packets actually arrive
-// from. This is the ground truth for NAT traversal: whatever a console believes
-// its external address to be, this is where replies have to go.
+
+
+
 func observedAddress(connection *nex.PRUDPConnection) (string, uint16) {
 	switch address := connection.Address().(type) {
 	case *net.UDPAddr:
@@ -26,19 +26,19 @@ func observedAddress(connection *nex.PRUDPConnection) (string, uint16) {
 	}
 }
 
-// * ---------------------------------------------------------------------------
-// * NAT Traversal
-// * ---------------------------------------------------------------------------
 
-// requestProbeInitiation asks a set of peers to send a probe packet at the
-// caller, so the caller's NAT opens a path for their traffic.
-//
-// common-go implements only the later RequestProbeInitiationExt. This is the
-// original form, which a NEX 3.0.1 title may well use instead: it takes station
-// URLs directly rather than strings, and the station to probe is implied to be
-// the caller's own.
-//
-// Response: no return values.
+
+
+
+
+
+
+
+
+
+
+
+
 func requestProbeInitiation(err error, packet nex.PacketInterface, callID uint32, urlTargetList types.List[types.StationURL]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
@@ -48,7 +48,7 @@ func requestProbeInitiation(err error, packet nex.PacketInterface, callID uint32
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 	server := endpoint.Server
 
-	// * The station each target should probe is the caller's public station.
+
 	stationToProbe := types.NewStationURL("")
 	for _, stationURL := range connection.StationURLs {
 		if stationURL.IsPublic() {
@@ -114,13 +114,13 @@ func requestProbeInitiation(err error, packet nex.PacketInterface, callID uint32
 	return response, nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Ticket Granting extras
-// * ---------------------------------------------------------------------------
 
-// getPID resolves a username to a PID.
-//
-// Response: PID.
+
+
+
+
+
+
 func getPID(err error, packet nex.PacketInterface, callID uint32, strUserName types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
@@ -145,9 +145,9 @@ func getPID(err error, packet nex.PacketInterface, callID uint32, strUserName ty
 	return response, nil
 }
 
-// getName resolves a PID to a username.
-//
-// Response: String.
+
+
+
 func getName(err error, packet nex.PacketInterface, callID uint32, id types.PID) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
@@ -172,16 +172,16 @@ func getName(err error, packet nex.PacketInterface, callID uint32, id types.PID)
 	return response, nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Tracing
-// * ---------------------------------------------------------------------------
 
-// traceHandler logs every RMC request that reaches an endpoint.
-//
-// No packet capture of this game's traffic has ever been published, so when
-// something does not work the trace is the only specification available: it
-// shows exactly which protocol and method the console called and with what
-// bytes. Enable it with SONIC_LOG_PACKETS=1.
+
+
+
+
+
+
+
+
+
 func traceHandler(tag string) func(packet nex.PacketInterface) {
 	return func(packet nex.PacketInterface) {
 		if !globals.Settings.LogPackets {

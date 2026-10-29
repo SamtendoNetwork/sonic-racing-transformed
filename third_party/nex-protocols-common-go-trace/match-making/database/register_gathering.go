@@ -8,7 +8,7 @@ import (
 	match_making_types "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 )
 
-// RegisterGathering registers a new gathering on the database. No participants are added
+
 func RegisterGathering(manager *common_globals.MatchmakingManager, ownerPID types.PID, hostPID types.PID, gathering *match_making_types.Gathering, gatheringType string) (types.DateTime, *nex.Error) {
 	startedTime := types.NewDateTime(0).Now()
 	var gatheringID uint32

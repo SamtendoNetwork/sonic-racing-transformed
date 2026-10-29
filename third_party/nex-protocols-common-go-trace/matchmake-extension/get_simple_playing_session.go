@@ -20,7 +20,7 @@ func (commonProtocol *CommonProtocol) getSimplePlayingSession(err error, packet 
 	connection := packet.Sender().(*nex.PRUDPConnection)
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 
-	// * Does nothing if element is not present in the List
+
 	listPID = slices.DeleteFunc(listPID, func(pid types.PID) bool {
 		return pid == connection.PID()
 	})

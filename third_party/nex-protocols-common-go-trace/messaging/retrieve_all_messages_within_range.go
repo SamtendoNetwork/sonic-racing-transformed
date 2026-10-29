@@ -17,8 +17,8 @@ func (commonProtocol *CommonProtocol) retrieveAllMessagesWithinRange(err error, 
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
 	}
 
-	// * There doesn't seem to be a limit on official servers, as you can query messages with a length over 100
-	// * We will impose that limit ourselves to prevent abuse
+
+
 	if resultRange.Length > 100 {
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "ResultRange.Length is over 100")
 	}
@@ -34,7 +34,7 @@ func (commonProtocol *CommonProtocol) retrieveAllMessagesWithinRange(err error, 
 
 	recipientID, recipientType := common_globals.GetMessageRecipientData(libraryVersion, recipient)
 
-	// * If the MessageRecipient is invalid, just return no entries
+
 	if valid := commonProtocol.manager.ValidateMessageRecipient(commonProtocol.manager, connection.PID(), recipientID, recipientType); valid {
 		lstMessages, nexError = messaging_database.RetrieveAllMessagesWithinRange(commonProtocol.manager, recipientID, recipientType, resultRange)
 		if nexError != nil {

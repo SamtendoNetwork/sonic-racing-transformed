@@ -46,7 +46,7 @@ type CommonProtocol struct {
 	OnAfterGetlstFriendNotificationData            func(packet nex.PacketInterface, lstTypes types.List[notifications_constants.NotificationCategory])
 }
 
-// SetDatabase defines the matchmaking manager to be used by the common protocol
+
 func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.MatchmakingManager) {
 	var err error
 
@@ -147,14 +147,14 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 		return
 	}
 
-	// * In case the server is restarted, unregister any previous matchmake sessions
+
 	_, err = manager.Database.Exec(`UPDATE matchmaking.gatherings SET registered=false WHERE type='MatchmakeSession'`)
 	if err != nil {
 		common_globals.Logger.Error(err.Error())
 		return
 	}
 
-	// * Mark all notifications as inactive
+
 	_, err = manager.Database.Exec(`UPDATE matchmaking.notifications SET active=false`)
 	if err != nil {
 		common_globals.Logger.Error(err.Error())
@@ -162,14 +162,14 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Matchma
 	}
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol matchmake_extension.Interface) *CommonProtocol {
 	endpoint := protocol.Endpoint().(*nex.PRUDPEndPoint)
 
 	commonProtocol := &CommonProtocol{
 		endpoint:                       endpoint,
 		protocol:                       protocol,
-		PersistentGatheringCreationMax: constants.PersistentGatheringCreationMax, // * Default of 4 active persistent gatherings per user
+		PersistentGatheringCreationMax: constants.PersistentGatheringCreationMax,
 	}
 
 	protocol.SetHandlerOpenParticipation(commonProtocol.openParticipation)

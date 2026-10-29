@@ -10,22 +10,22 @@ import (
 	match_making_database "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making/database"
 )
 
-// ValidateMessageRecipient checks that the given PID can access the given recipient data
+
 func ValidateMessageRecipient(manager *common_globals.MessagingManager, pid types.PID, recipientID types.UInt64, recipientType messaging_constants.RecipientType) bool {
 	switch recipientType {
-	case 1: // * PID - Valid if the recipient ID is the same as the given PID
+	case 1:
 		if pid != types.PID(recipientID) {
 			return false
 		}
 
 		return true
-	case 2: // * Gathering ID - Valid if the given PID is a participant on the gathering
+	case 2:
 		if manager.MatchmakingManager == nil {
 			common_globals.Logger.Warning("MessagingManager.MatchmakingManager is not set!")
 			return false
 		}
 
-		// * Check that the gathering exists
+
 		manager.MatchmakingManager.Mutex.RLock()
 		defer manager.MatchmakingManager.Mutex.RUnlock()
 		_, _, participants, _, nexError := match_making_database.FindGatheringByID(manager.MatchmakingManager, uint32(recipientID))

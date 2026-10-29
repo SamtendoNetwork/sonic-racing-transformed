@@ -21,7 +21,7 @@ func (commonProtocol *CommonProtocol) getlstFriendNotificationData(err error, pa
 
 	notificationTypes := make([]uint32, len(lstTypes))
 	for i, notificationType := range lstTypes {
-		// * This method can only receive notifications within the range 101-108, which are reserved for game-specific notifications
+
 		if notificationType < 101 || notificationType > 108 {
 			return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
 		}

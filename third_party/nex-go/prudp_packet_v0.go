@@ -12,14 +12,14 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/constants"
 )
 
-// PRUDPPacketV0 represents a PRUDPv0 packet
+
 type PRUDPPacketV0 struct {
 	PRUDPPacket
 }
 
-// Copy copies the packet into a new PRUDPPacketV0
-//
-// Retains the same PRUDPConnection pointer
+
+
+
 func (p *PRUDPPacketV0) Copy() PRUDPPacketInterface {
 	copied, _ := NewPRUDPPacketV0(p.server, p.sender, nil)
 
@@ -54,13 +54,13 @@ func (p *PRUDPPacketV0) Copy() PRUDPPacketInterface {
 	return copied
 }
 
-// Version returns the packets PRUDP version
+
 func (p *PRUDPPacketV0) Version() int {
 	return int(p.version)
 }
 
 func (p *PRUDPPacketV0) decode() error {
-	// * Header is technically 11 bytes but checking for 12 includes the checksum
+
 	if p.readStream.Remaining() < 12 {
 		return errors.New("Failed to read PRUDPv0 header. Not have enough data")
 	}
@@ -143,7 +143,7 @@ func (p *PRUDPPacketV0) decode() error {
 			return fmt.Errorf("Failed to read PRUDPv0 payload size. %s", err.Error())
 		}
 	} else {
-		// * Some Quazal games use a 4 byte checksum. NEX uses 1 byte
+
 		if server.PRUDPV0Settings.UseEnhancedChecksum {
 			payloadSize = uint16(p.readStream.Remaining() - 4)
 		} else {
@@ -188,7 +188,7 @@ func (p *PRUDPPacketV0) decode() error {
 	return nil
 }
 
-// Bytes encodes a PRUDPv0 packet into a byte slice
+
 func (p *PRUDPPacketV0) Bytes() []byte {
 	server := p.server
 	stream := NewByteStreamOut(server.LibraryVersions, server.ByteStreamSettings)
@@ -236,17 +236,17 @@ func (p *PRUDPPacketV0) Bytes() []byte {
 	return stream.Bytes()
 }
 
-// CalculateConnectionSignature calculates connection signature using the registered calculator.
+
 func (p *PRUDPPacketV0) CalculateConnectionSignature(addr net.Addr) ([]byte, error) {
 	return p.server.PRUDPV0Settings.ConnectionSignatureCalculator(p, addr)
 }
 
-// CalculateSignature calculates PRUDP packet signature using the registered calculator.
+
 func (p *PRUDPPacketV0) CalculateSignature(sessionKey, connectionSignature []byte) []byte {
 	return p.server.PRUDPV0Settings.SignatureCalculator(p, sessionKey, connectionSignature)
 }
 
-// NewPRUDPPacketV0 creates and returns a new PacketV0 using the provided Client and stream
+
 func NewPRUDPPacketV0(server *PRUDPServer, connection *PRUDPConnection, readStream *ByteStreamIn) (*PRUDPPacketV0, error) {
 	packet := &PRUDPPacketV0{
 		PRUDPPacket: PRUDPPacket{
@@ -268,7 +268,7 @@ func NewPRUDPPacketV0(server *PRUDPServer, connection *PRUDPConnection, readStre
 	return packet, nil
 }
 
-// NewPRUDPPacketsV0 reads all possible PRUDPv0 packets from the stream
+
 func NewPRUDPPacketsV0(server *PRUDPServer, connection *PRUDPConnection, readStream *ByteStreamIn) ([]PRUDPPacketInterface, error) {
 	packets := make([]PRUDPPacketInterface, 0)
 

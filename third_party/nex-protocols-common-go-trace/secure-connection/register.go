@@ -29,7 +29,7 @@ func (commonProtocol *CommonProtocol) register(err error, packet nex.PacketInter
 		common_globals.Logger.Error("SecureConnection::Register blocked")
 		retval = types.NewQResultError(nex.ResultCodes.Authentication.ValidationFailed)
 	} else {
-		// * vecMyURLs may contain multiple StationURLs. Search them all
+
 		var localStation *types.StationURL
 		var publicStation *types.StationURL
 
@@ -44,12 +44,12 @@ func (commonProtocol *CommonProtocol) register(err error, packet nex.PacketInter
 				continue
 			}
 
-			// * Station reports itself as being non-public (local)
+
 			if localStation == nil && !stationURL.IsPublic() {
 				localStation = &stationURL
 			}
 
-			// * Still did not find the station, trying heuristics
+
 			if localStation == nil && natf == constants.UnknownNATFiltering && natm == constants.UnknownNATMapping {
 				localStation = &stationURL
 			}
@@ -70,7 +70,7 @@ func (commonProtocol *CommonProtocol) register(err error, packet nex.PacketInter
 			var address string
 			var port uint16
 
-			// * We have to duplicate this because Go automatically breaks on switch statements
+
 			switch clientAddress := connection.Address().(type) {
 			case *net.UDPAddr:
 				address = clientAddress.IP.String()
@@ -93,10 +93,10 @@ func (commonProtocol *CommonProtocol) register(err error, packet nex.PacketInter
 		localStation.SetRVConnectionID(connection.ID)
 		publicStation.SetRVConnectionID(connection.ID)
 
-		// Sonic Transformed uses an early NEX 3.0.1 StationURL implementation.
-		// Preserve the field order emitted by that client and Nintendo's
-		// legacy server. The generic formatter iterates a Go map and emits
-		// the fields in a random order on every call.
+
+
+
+
 		address, _ := publicStation.Address()
 		port, _ := publicStation.PortNumber()
 		natf, _ := publicStation.NATFiltering()

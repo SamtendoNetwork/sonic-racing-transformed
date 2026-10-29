@@ -8,7 +8,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetNotificationDatas gets the notification datas that belong to friends of the user and match with any of the given types
+
 func GetNotificationDatas(manager *common_globals.MatchmakingManager, sourcePID types.PID, notificationTypes []uint32) ([]notifications_types.NotificationEvent, *nex.Error) {
 	dataList := make([]notifications_types.NotificationEvent, 0)
 
@@ -19,7 +19,7 @@ func GetNotificationDatas(manager *common_globals.MatchmakingManager, sourcePID 
 		common_globals.Logger.Warning("GetNotificationDatas missing manager.GetUserFriendPIDs!")
 	}
 
-	// * No friends to check
+
 	if len(friendList) == 0 {
 		return dataList, nil
 	}

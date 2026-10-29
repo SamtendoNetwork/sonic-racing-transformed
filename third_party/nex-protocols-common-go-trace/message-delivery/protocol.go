@@ -13,7 +13,7 @@ type CommonProtocol struct {
 	manager               *common_globals.MessagingManager
 }
 
-// SetManager defines the messaging manager to be used by the common protocol
+
 func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.MessagingManager) {
 	var err error
 
@@ -111,7 +111,7 @@ func (commonProtocol *CommonProtocol) SetManager(manager *common_globals.Messagi
 	}
 }
 
-// NewCommonProtocol returns a new CommonProtocol
+
 func NewCommonProtocol(protocol message_delivery.Interface) *CommonProtocol {
 	commonProtocol := &CommonProtocol{
 		endpoint: protocol.Endpoint(),

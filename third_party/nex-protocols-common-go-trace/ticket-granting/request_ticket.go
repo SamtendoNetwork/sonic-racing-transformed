@@ -36,7 +36,7 @@ func (commonProtocol *CommonProtocol) requestTicket(err error, packet nex.Packet
 		encryptedTicket, errorCode = generateTicket(sourceAccount, targetAccount, nil, commonProtocol.SessionKeyLength, endpoint)
 	}
 
-	// * If any errors are triggered, return them in %retval%
+
 	retval := types.NewQResultSuccess(nex.ResultCodes.Core.Unknown)
 	bufResponse := types.NewBuffer(encryptedTicket)
 	pSourceKey := types.NewString("")

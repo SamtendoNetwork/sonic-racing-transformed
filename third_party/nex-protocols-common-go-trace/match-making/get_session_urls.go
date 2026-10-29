@@ -37,7 +37,7 @@ func (commonProtocol *CommonProtocol) getSessionURLs(err error, packet nex.Packe
 
 	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 
-	// * If no host was found, return an empty list of station URLs
+
 	if host == nil {
 		common_globals.Logger.Error("Host client not found")
 		stationURLs := types.NewList[types.StationURL]()

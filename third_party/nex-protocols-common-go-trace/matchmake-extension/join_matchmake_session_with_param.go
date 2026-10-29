@@ -25,7 +25,7 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionWithParam(err error, p
 	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
 
 	if joinMatchmakeSessionParam.GIDForParticipationCheck != 0 {
-		// * Check that all new participants are participating in the specified gathering ID
+
 		nexError := database.CheckGatheringForParticipation(commonProtocol.manager, uint32(joinMatchmakeSessionParam.GIDForParticipationCheck), append(joinMatchmakeSessionParam.AdditionalParticipants, connection.PID()))
 		if nexError != nil {
 			commonProtocol.manager.Mutex.Unlock()
@@ -50,7 +50,7 @@ func (commonProtocol *CommonProtocol) joinMatchmakeSessionWithParam(err error, p
 		return nil, nex.NewError(nex.ResultCodes.RendezVous.MatchmakeSessionSystemPasswordUnmatch, "Matchmake session system password does not match")
 	}
 
-	// * Allow game servers to do their own permissions checks
+
 	if commonProtocol.CanJoinMatchmakeSession != nil {
 		nexError = commonProtocol.CanJoinMatchmakeSession(commonProtocol.manager, connection.PID(), joinedMatchmakeSession)
 	} else {

@@ -8,7 +8,7 @@ import (
 	messaging_types "github.com/PretendoNetwork/nex-protocols-go/v2/messaging/types"
 )
 
-// InsertInstantMessage inserts a new instant message into the database
+
 func InsertInstantMessage(manager *common_globals.MessagingManager, message messaging_types.UserMessage, recipientID types.UInt64, recipientType messaging_constants.RecipientType, messageType string) (uint32, *nex.Error) {
 	var err error
 	var messageID uint32

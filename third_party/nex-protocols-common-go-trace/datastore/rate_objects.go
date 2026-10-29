@@ -30,10 +30,10 @@ func (commonProtocol *CommonProtocol) rateObjects(err error, packet nex.PacketIn
 	pRatings := types.NewList[datastore_types.DataStoreRatingInfo]()
 	pResults := types.NewList[types.QResult]()
 
-	// * Real DataStore does not actually check this.
-	// * I just didn't feel like working out the
-	// * logic for differing sized lists. So force
-	// * them to always be the same
+
+
+
+
 	if len(targets) != len(params) {
 		return nil, nex.NewError(nex.ResultCodes.DataStore.InvalidArgument, "change_error")
 	}
@@ -41,7 +41,7 @@ func (commonProtocol *CommonProtocol) rateObjects(err error, packet nex.PacketIn
 	var errorCode *nex.Error
 
 	for i, target := range targets {
-		// * We already checked that targets and params will have the same length
+
 		param := params[i]
 
 		objectInfo, errCode := commonProtocol.GetObjectInfoByDataIDWithPassword(target.DataID, param.AccessPassword)
@@ -74,7 +74,7 @@ func (commonProtocol *CommonProtocol) rateObjects(err error, packet nex.PacketIn
 	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 
 	pRatings.WriteTo(rmcResponseStream)
-	pResults.WriteTo(rmcResponseStream) // * pResults is ALWAYS empty in SMM?
+	pResults.WriteTo(rmcResponseStream)
 
 	rmcResponseBody := rmcResponseStream.Bytes()
 

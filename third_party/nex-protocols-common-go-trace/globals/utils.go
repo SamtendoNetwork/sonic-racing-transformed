@@ -17,15 +17,15 @@ import (
 
 var OutgoingCallID *nex.Counter[uint32] = nex.NewCounter[uint32](0)
 
-// DeleteIndex removes a value from a slice with the given index
+
 func DeleteIndex(s []uint32, index int) []uint32 {
 	s[index] = s[len(s)-1]
 	return s[:len(s)-1]
 }
 
-// RemoveDuplicates removes duplicate entries on a slice
+
 func RemoveDuplicates[T comparable](sliceList []T) []T {
-	// * Extracted from https://stackoverflow.com/a/66751055
+
 	allKeys := make(map[T]bool)
 	list := []T{}
 	for _, item := range sliceList {
@@ -37,12 +37,12 @@ func RemoveDuplicates[T comparable](sliceList []T) []T {
 	return list
 }
 
-// ResizeString resizes the string with the specified length in characters (runes)
+
 func ResizeString(str string, length int) string {
 	return string([]rune(str)[:length])
 }
 
-// CheckValidGathering checks if a Gathering is valid
+
 func CheckValidGathering(gathering match_making_types.Gathering) bool {
 	if len(gathering.Description) > 256 {
 		return false
@@ -51,7 +51,7 @@ func CheckValidGathering(gathering match_making_types.Gathering) bool {
 	return true
 }
 
-// CheckValidMatchmakeSession checks if a MatchmakeSession is valid
+
 func CheckValidMatchmakeSession(matchmakeSession match_making_types.MatchmakeSession) bool {
 	if !CheckValidGathering(matchmakeSession.Gathering) {
 		return false
@@ -69,12 +69,12 @@ func CheckValidMatchmakeSession(matchmakeSession match_making_types.MatchmakeSes
 		return false
 	}
 
-	// * Except for UserPassword, all strings must have a length lower than 256
+
 	if len(matchmakeSession.CodeWord) > 256 {
 		return false
 	}
 
-	// * All buffers must have a length lower than 512
+
 	if len(matchmakeSession.ApplicationBuffer) > 512 {
 		return false
 	}
@@ -86,20 +86,20 @@ func CheckValidMatchmakeSession(matchmakeSession match_making_types.MatchmakeSes
 	return true
 }
 
-// CheckValidPersistentGathering checks if a PersistentGathering is valid
+
 func CheckValidPersistentGathering(persistentGathering match_making_types.PersistentGathering) bool {
 	if !CheckValidGathering(persistentGathering.Gathering) {
 		return false
 	}
 
-	// * Only allow normal and password-protected community types
+
 	if uint32(persistentGathering.CommunityType) != uint32(match_making_constants.PersistentGatheringTypeOpen) && uint32(persistentGathering.CommunityType) != uint32(match_making_constants.PersistentGatheringTypePasswordLocked) {
 		return false
 	}
 
-	// * The UserPassword from a MatchmakeSession can be up to 32 characters, assuming the same here
-	//
-	// TODO - IS this actually the case?
+
+
+
 	if len(persistentGathering.Password) > 32 {
 		return false
 	}
@@ -108,12 +108,12 @@ func CheckValidPersistentGathering(persistentGathering match_making_types.Persis
 		return false
 	}
 
-	// * All buffers must have a length lower than 512
+
 	if len(persistentGathering.ApplicationBuffer) > 512 {
 		return false
 	}
 
-	// * Check that the participation dates are within bounds of the current date
+
 	currentTime := types.NewDateTime(0).Now()
 
 	if persistentGathering.ParticipationStartDate != 0 && persistentGathering.ParticipationStartDate > currentTime {
@@ -127,15 +127,15 @@ func CheckValidPersistentGathering(persistentGathering match_making_types.Persis
 	return true
 }
 
-// CanJoinMatchmakeSession checks if a PID is allowed to join a matchmake session
+
 func CanJoinMatchmakeSession(manager *MatchmakingManager, pid types.PID, matchmakeSession match_making_types.MatchmakeSession) *nex.Error {
-	// TODO - Is this the right error?
+
 	if !matchmakeSession.OpenParticipation {
 		return nex.NewError(nex.ResultCodes.RendezVous.PermissionDenied, "change_error")
 	}
 
-	// * Only allow friends
-	// TODO - This won't work on Switch!
+
+
 	if matchmakeSession.ParticipationPolicy == 98 {
 		if manager.GetUserFriendPIDs == nil {
 			Logger.Warning("Missing GetUserFriendPIDs!")
@@ -151,7 +151,7 @@ func CanJoinMatchmakeSession(manager *MatchmakingManager, pid types.PID, matchma
 	return nil
 }
 
-// GetUserMessageRecipientData returns the recipient ID and the recipient type of a message
+
 func GetUserMessageRecipientData(libraryVersion *nex.LibraryVersion, userMessage messaging_types.UserMessage) (types.UInt64, messaging_constants.RecipientType) {
 	if libraryVersion.GreaterOrEqual("4.0.0") {
 		switch userMessage.MessageRecipient.UIRecipientType {
@@ -161,14 +161,14 @@ func GetUserMessageRecipientData(libraryVersion *nex.LibraryVersion, userMessage
 			return types.UInt64(userMessage.MessageRecipient.GatheringID), userMessage.MessageRecipient.UIRecipientType
 		default:
 			Logger.Errorf("Invalid recipient type %d", userMessage.MessageRecipient.UIRecipientType)
-			return 0, userMessage.MessageRecipient.UIRecipientType // * Unknown
+			return 0, userMessage.MessageRecipient.UIRecipientType
 		}
 	}
 
 	return types.UInt64(userMessage.IDRecipient), userMessage.UIRecipientType
 }
 
-// SetUserMessageRecipientData sets the recipient ID and the recipient type of a message
+
 func SetUserMessageRecipientData(libraryVersion *nex.LibraryVersion, userMessage messaging_types.UserMessage, recipientID types.UInt64, recipientType messaging_constants.RecipientType) messaging_types.UserMessage {
 	if libraryVersion.GreaterOrEqual("4.0.0") {
 		switch recipientType {
@@ -189,7 +189,7 @@ func SetUserMessageRecipientData(libraryVersion *nex.LibraryVersion, userMessage
 	return userMessage
 }
 
-// GetMessageRecipientData returns the recipient ID and the recipient type of a message recipient
+
 func GetMessageRecipientData(libraryVersion *nex.LibraryVersion, recipient messaging_types.MessageRecipient) (types.UInt64, messaging_constants.RecipientType) {
 	if libraryVersion.GreaterOrEqual("4.0.0") {
 		switch recipient.UIRecipientType {
@@ -199,14 +199,14 @@ func GetMessageRecipientData(libraryVersion *nex.LibraryVersion, recipient messa
 			return types.UInt64(recipient.GatheringID), recipient.UIRecipientType
 		default:
 			Logger.Errorf("Invalid recipient type %d", recipient.UIRecipientType)
-			return 0, recipient.UIRecipientType // * Unknown
+			return 0, recipient.UIRecipientType
 		}
 	}
 
 	return types.UInt64(recipient.IDRecipient), recipient.UIRecipientType
 }
 
-// SendNotificationEvent sends a notification event to the specified targets
+
 func SendNotificationEvent(endpoint *nex.PRUDPEndPoint, event notifications_types.NotificationEvent, targets []uint64) {
 	server := endpoint.Server
 	stream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
@@ -254,7 +254,7 @@ func SendNotificationEvent(endpoint *nex.PRUDPEndPoint, event notifications_type
 	}
 }
 
-// SendMessage sends a message to the specified targets
+
 func SendMessage(endpoint *nex.PRUDPEndPoint, message types.DataHolder, targets []*nex.PRUDPConnection) {
 	server := endpoint.Server
 	stream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())

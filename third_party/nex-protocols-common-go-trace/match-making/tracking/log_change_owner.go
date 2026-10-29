@@ -8,7 +8,7 @@ import (
 	"github.com/PretendoNetwork/nex-go/v2/types"
 )
 
-// LogChangeOwner logs an owner change event on the given database
+
 func LogChangeOwner(db *sql.DB, sourcePID types.PID, gatheringID uint32, oldOwnerPID types.PID, newOwnerPID types.PID) *nex.Error {
 	eventTime := time.Now().UTC()
 

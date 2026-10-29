@@ -6,7 +6,7 @@ import (
 	"github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making/database"
 )
 
-// EndMatchmakeSessionsParticipation ends participation on all matchmake sessions
+
 func EndMatchmakeSessionsParticipation(manager *common_globals.MatchmakingManager, connection *nex.PRUDPConnection) {
 	rows, err := manager.Database.Query(`SELECT id FROM matchmaking.gatherings WHERE type='MatchmakeSession' AND $1=ANY(participants)`, connection.PID())
 	if err != nil {

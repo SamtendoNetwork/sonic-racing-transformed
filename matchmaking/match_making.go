@@ -11,11 +11,11 @@ import (
 	notificationstypes "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/types"
 )
 
-// * MatchMaking (0x15) is the original Quazal Rendez-Vous matchmaking surface.
-// * MatchmakeExtension (0x6D) is Nintendo's replacement and most Wii U titles
-// * use it, but both ship in nexmm and a 2013 launch title may well call the
-// * older one. Both are backed by the same store, so it does not matter which
-// * the game picks.
+
+
+
+
+
 
 func (p *Protocol) registerMatchMaking(protocol *matchmakingprotocol.Protocol) {
 	protocol.SetHandlerRegisterGathering(p.registerGathering)
@@ -42,9 +42,9 @@ func (p *Protocol) registerMatchMaking(protocol *matchmakingprotocol.Protocol) {
 	protocol.SetHandlerMigrateGatheringOwnershipV1(p.migrateGatheringOwnershipV1)
 }
 
-// registerGathering creates a gathering through the older protocol.
-//
-// Response: Uint32 gid.
+
+
+
 func (p *Protocol) registerGathering(err error, packet nex.PacketInterface, callID uint32, anyGathering matchmakingtypes.GatheringHolder) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -85,10 +85,10 @@ func (p *Protocol) registerGathering(err error, packet nex.PacketInterface, call
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodRegisterGathering, callID, stream.Bytes()), nil
 }
 
-// unregisterGathering destroys a gathering. Only the owner may do so, and every
-// participant is told the gathering is gone.
-//
-// Response: Bool retval.
+
+
+
+
 func (p *Protocol) unregisterGathering(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -107,9 +107,9 @@ func (p *Protocol) unregisterGathering(err error, packet nex.PacketInterface, ca
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodUnregisterGathering, callID, stream.Bytes()), nil
 }
 
-// unregisterGatherings destroys several gatherings at once.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) unregisterGatherings(err error, packet nex.PacketInterface, callID uint32, lstGatherings types.List[types.UInt32]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -160,9 +160,9 @@ func (p *Protocol) destroyGathering(connection *nex.PRUDPConnection, endpoint *n
 	return nil
 }
 
-// updateGathering replaces a gathering's settings, owner only.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) updateGathering(err error, packet nex.PacketInterface, callID uint32, anyGathering matchmakingtypes.GatheringHolder) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -202,9 +202,9 @@ func (p *Protocol) updateGathering(err error, packet nex.PacketInterface, callID
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodUpdateGathering, callID, stream.Bytes()), nil
 }
 
-// participate joins a gathering through the older protocol.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) participate(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, strMessage types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -242,9 +242,9 @@ func (p *Protocol) participate(err error, packet nex.PacketInterface, callID uin
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodParticipate, callID, stream.Bytes()), nil
 }
 
-// cancelParticipation leaves a gathering.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) cancelParticipation(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, strMessage types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -274,9 +274,9 @@ func (p *Protocol) cancelParticipation(err error, packet nex.PacketInterface, ca
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodCancelParticipation, callID, stream.Bytes()), nil
 }
 
-// getParticipants lists the PIDs in a gathering.
-//
-// Response: List<PID> lstParticipants.
+
+
+
 func (p *Protocol) getParticipants(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -300,9 +300,9 @@ func (p *Protocol) getParticipants(err error, packet nex.PacketInterface, callID
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodGetParticipants, callID, stream.Bytes()), nil
 }
 
-// getDetailedParticipants lists the participants with their details.
-//
-// Response: List<ParticipantDetails> lstParticipants.
+
+
+
 func (p *Protocol) getDetailedParticipants(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -326,14 +326,14 @@ func (p *Protocol) getDetailedParticipants(err error, packet nex.PacketInterface
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodGetDetailedParticipants, callID, stream.Bytes()), nil
 }
 
-// getParticipantsURLs returns every participant's station URLs.
-//
-// This is the call that makes peer to peer racing possible: each console learns
-// the others' addresses from it and connects directly. The station URLs come
-// from SecureConnection::RegisterEx, where nex-go already rewrote the public
-// address to the source address it actually observed.
-//
-// Response: List<StationURL> lstStationURL.
+
+
+
+
+
+
+
+
 func (p *Protocol) getParticipantsURLs(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -362,9 +362,9 @@ func (p *Protocol) getParticipantsURLs(err error, packet nex.PacketInterface, ca
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodGetParticipantsURLs, callID, stream.Bytes()), nil
 }
 
-// findByID looks up gatherings by ID.
-//
-// Response: List<Data<Gathering>> lstGathering.
+
+
+
 func (p *Protocol) findByID(err error, packet nex.PacketInterface, callID uint32, lstID types.List[types.UInt32]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -389,9 +389,9 @@ func (p *Protocol) findByID(err error, packet nex.PacketInterface, callID uint32
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodFindByID, callID, stream.Bytes()), nil
 }
 
-// findBySingleID looks up one gathering by ID.
-//
-// Response: Bool bResult, Data<Gathering> pGathering.
+
+
+
 func (p *Protocol) findBySingleID(err error, packet nex.PacketInterface, callID uint32, id types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -418,9 +418,9 @@ func (p *Protocol) findBySingleID(err error, packet nex.PacketInterface, callID 
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodFindBySingleID, callID, stream.Bytes()), nil
 }
 
-// findByOwner lists the gatherings a player owns.
-//
-// Response: List<Data<Gathering>> lstGathering.
+
+
+
 func (p *Protocol) findByOwner(err error, packet nex.PacketInterface, callID uint32, id types.PID, resultRange types.ResultRange) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -443,9 +443,9 @@ func (p *Protocol) findByOwner(err error, packet nex.PacketInterface, callID uin
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodFindByOwner, callID, stream.Bytes()), nil
 }
 
-// findByParticipants lists the gatherings any of the given players are in.
-//
-// Response: List<Data<Gathering>> lstGathering.
+
+
+
 func (p *Protocol) findByParticipants(err error, packet nex.PacketInterface, callID uint32, pid types.List[types.PID]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -478,9 +478,9 @@ func (p *Protocol) findByParticipants(err error, packet nex.PacketInterface, cal
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodFindByParticipants, callID, stream.Bytes()), nil
 }
 
-// launchSession records the host's session URL and starts the session.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) launchSession(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, strURL types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -507,12 +507,12 @@ func (p *Protocol) launchSession(err error, packet nex.PacketInterface, callID u
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodLaunchSession, callID, stream.Bytes()), nil
 }
 
-// updateSessionURL migrates hosting to the caller.
-//
-// Mario Kart 7 is known to send an empty strURL here and rely purely on the
-// host change, so the URL is stored but not required.
-//
-// Response: Bool retval.
+
+
+
+
+
+
 func (p *Protocol) updateSessionURL(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, strURL types.String) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -542,9 +542,9 @@ func (p *Protocol) updateSessionURL(err error, packet nex.PacketInterface, callI
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodUpdateSessionURL, callID, stream.Bytes()), nil
 }
 
-// getSessionURL returns the host's session URL.
-//
-// Response: Bool retval, String strURL.
+
+
+
 func (p *Protocol) getSessionURL(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -569,10 +569,10 @@ func (p *Protocol) getSessionURL(err error, packet nex.PacketInterface, callID u
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodGetSessionURL, callID, stream.Bytes()), nil
 }
 
-// getSessionURLs returns the host's station URLs, so joining players know where
-// to send their peer to peer traffic.
-//
-// Response: List<StationURL> lstURLs.
+
+
+
+
 func (p *Protocol) getSessionURLs(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -610,9 +610,9 @@ func (p *Protocol) getSessionURLs(err error, packet nex.PacketInterface, callID 
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodGetSessionURLs, callID, stream.Bytes()), nil
 }
 
-// getState returns a gathering's state value.
-//
-// Response: Bool retval, Uint32 uiState.
+
+
+
 func (p *Protocol) getState(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -637,9 +637,9 @@ func (p *Protocol) getState(err error, packet nex.PacketInterface, callID uint32
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodGetState, callID, stream.Bytes()), nil
 }
 
-// setState changes a gathering's state, owner only.
-//
-// Response: Bool retval.
+
+
+
 func (p *Protocol) setState(err error, packet nex.PacketInterface, callID uint32, idGathering types.UInt32, uiNewState matchmakingconstants.GatheringState) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -665,12 +665,12 @@ func (p *Protocol) setState(err error, packet nex.PacketInterface, callID uint32
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodSetState, callID, stream.Bytes()), nil
 }
 
-// updateSessionHost makes the caller the host, optionally taking ownership too.
-//
-// Host migration is what keeps a race alive when the current host quits: a
-// remaining console claims the role and the others follow it.
-//
-// Response: no return values.
+
+
+
+
+
+
 func (p *Protocol) updateSessionHost(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, isMigrateOwner types.Bool) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -718,9 +718,9 @@ func (p *Protocol) updateSessionHost(err error, packet nex.PacketInterface, call
 	return respondEmpty(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodUpdateSessionHost, callID), nil
 }
 
-// updateSessionHostV1 makes the caller the host.
-//
-// Response: no return values.
+
+
+
 func (p *Protocol) updateSessionHostV1(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -743,10 +743,10 @@ func (p *Protocol) updateSessionHostV1(err error, packet nex.PacketInterface, ca
 	return respondEmpty(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodUpdateSessionHostV1, callID), nil
 }
 
-// migrateGatheringOwnershipV1 hands ownership to the first candidate that is
-// actually still a participant.
-//
-// Response: Bool retval.
+
+
+
+
 func (p *Protocol) migrateGatheringOwnershipV1(err error, packet nex.PacketInterface, callID uint32, gid types.UInt32, lstPotentialNewOwnersID types.List[types.PID]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		return nil, invalidArgument(err)
@@ -794,12 +794,12 @@ func (p *Protocol) migrateGatheringOwnershipV1(err error, packet nex.PacketInter
 	return respond(endpoint, matchmakingprotocol.ProtocolID, matchmakingprotocol.MethodMigrateGatheringOwnershipV1, callID, stream.Bytes()), nil
 }
 
-// * ---------------------------------------------------------------------------
-// * Shared helpers
-// * ---------------------------------------------------------------------------
 
-// participantSession fetches a session and verifies the caller is in it.
-// The caller must hold the lock.
+
+
+
+
+
 func (p *Protocol) participantSession(connection *nex.PRUDPConnection, gatheringID uint32) (*Session, *nex.Error) {
 	session, nexError := p.Store.GetLocked(gatheringID)
 	if nexError != nil {
@@ -813,7 +813,7 @@ func (p *Protocol) participantSession(connection *nex.PRUDPConnection, gathering
 	return session, nil
 }
 
-// participantList returns the distinct participant PIDs of a session.
+
 func participantList(session *Session) types.List[types.PID] {
 	participants := types.NewList[types.PID]()
 	for _, pid := range commonglobals.RemoveDuplicates(session.Participants) {
@@ -823,8 +823,8 @@ func participantList(session *Session) types.List[types.PID] {
 	return participants
 }
 
-// participantDetails describes each participant, including how many local
-// players they brought with them.
+
+
 func participantDetails(session *Session) types.List[matchmakingtypes.ParticipantDetails] {
 	counts := make(map[uint64]uint16)
 	for _, pid := range session.Participants {
@@ -835,8 +835,8 @@ func participantDetails(session *Session) types.List[matchmakingtypes.Participan
 	for _, pid := range commonglobals.RemoveDuplicates(session.Participants) {
 		detail := matchmakingtypes.NewParticipantDetails()
 		detail.IDParticipant = types.NewPID(pid)
-		// * The real server returns the player's NNID here. Without an account
-		// * server to ask, the PID is the only name we can honestly give.
+
+
 		detail.StrName = types.NewString("")
 		detail.StrMessage = types.NewString("")
 		detail.UIParticipants = types.NewUInt16(counts[pid])
@@ -847,7 +847,7 @@ func participantDetails(session *Session) types.List[matchmakingtypes.Participan
 	return details
 }
 
-// stationURLsOf collects the station URLs of every connected participant.
+
 func stationURLsOf(endpoint *nex.PRUDPEndPoint, session *Session) types.List[types.StationURL] {
 	urls := types.NewList[types.StationURL]()
 
@@ -863,7 +863,7 @@ func stationURLsOf(endpoint *nex.PRUDPEndPoint, session *Session) types.List[typ
 	return urls
 }
 
-// applyRange slices a list to a ResultRange.
+
 func applyRange[T types.RVType](list *types.List[T], resultRange types.ResultRange) types.List[T] {
 	offset := int(resultRange.Offset)
 	length := int(resultRange.Length)

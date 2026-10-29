@@ -31,7 +31,7 @@ func (commonProtocol *CommonProtocol) deleteMessages(err error, packet nex.Packe
 
 	recipientID, recipientType := common_globals.GetMessageRecipientData(libraryVersion, recipient)
 
-	// * If the MessageRecipient is invalid, just do nothing
+
 	if valid := commonProtocol.manager.ValidateMessageRecipient(commonProtocol.manager, connection.PID(), recipientID, recipientType); valid {
 		nexError = messaging_database.DeleteMessages(commonProtocol.manager, recipientID, recipientType, lstMessagesToDelete)
 		if nexError != nil {

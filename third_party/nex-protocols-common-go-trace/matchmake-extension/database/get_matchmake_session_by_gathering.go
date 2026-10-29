@@ -10,7 +10,7 @@ import (
 	pqextended "github.com/PretendoNetwork/pq-extended"
 )
 
-// GetMatchmakeSessionByGathering gets a matchmake session with the given gathering data
+
 func GetMatchmakeSessionByGathering(manager *common_globals.MatchmakingManager, endpoint *nex.PRUDPEndPoint, gathering match_making_types.Gathering, participationCount uint32, startedTime types.DateTime) (match_making_types.MatchmakeSession, *nex.Error) {
 	resultMatchmakeSession := match_making_types.NewMatchmakeSession()
 	var resultAttribs []uint32

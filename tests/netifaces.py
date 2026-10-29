@@ -1,11 +1,3 @@
-"""Minimal netifaces stand-in for the NEX test client.
-
-anynet imports netifaces only to discover the local interface address and
-netmask, which an outbound client connecting to 127.0.0.1 never needs. The real
-package has no Windows wheel for this Python version and needs a C toolchain to
-build, so this supplies just the three names anynet touches.
-"""
-
 import socket
 
 AF_INET = socket.AF_INET

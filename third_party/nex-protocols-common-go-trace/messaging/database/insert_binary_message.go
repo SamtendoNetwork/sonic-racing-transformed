@@ -8,7 +8,7 @@ import (
 	messaging_types "github.com/PretendoNetwork/nex-protocols-go/v2/messaging/types"
 )
 
-// InsertBinaryMessage inserts a new binary message into the database
+
 func InsertBinaryMessage(manager *common_globals.MessagingManager, message messaging_types.BinaryMessage, recipientID types.UInt64, recipientType messaging_constants.RecipientType) *nex.Error {
 	var err error
 

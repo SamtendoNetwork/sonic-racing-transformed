@@ -6,7 +6,7 @@ import (
 	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
 )
 
-// GetCreatedPersistentGatherings returns the number of active persistent gatherings that a given PID owns
+
 func GetCreatedPersistentGatherings(manager *common_globals.MatchmakingManager, ownerPID types.PID) (int, *nex.Error) {
 	var createdPersistentGatherings int
 	err := manager.Database.QueryRow(`SELECT

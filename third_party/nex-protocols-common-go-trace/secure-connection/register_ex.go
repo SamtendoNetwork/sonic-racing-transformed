@@ -34,7 +34,7 @@ func (commonProtocol *CommonProtocol) registerEx(err error, packet nex.PacketInt
 		common_globals.Logger.Error(errorCode.Message)
 		retval = types.NewQResultError(errorCode.ResultCode)
 	} else {
-		// * vecMyURLs may contain multiple StationURLs. Search them all
+
 		var localStation *types.StationURL
 		var publicStation *types.StationURL
 
@@ -49,12 +49,12 @@ func (commonProtocol *CommonProtocol) registerEx(err error, packet nex.PacketInt
 				continue
 			}
 
-			// * Station reports itself as being non-public (local)
+
 			if localStation == nil && !stationURL.IsPublic() {
 				localStation = stationURL.CopyRef().(*types.StationURL)
 			}
 
-			// * Still did not find the station, trying heuristics
+
 			if localStation == nil && natf == constants.UnknownNATFiltering && natm == constants.UnknownNATMapping {
 				localStation = stationURL.CopyRef().(*types.StationURL)
 			}
@@ -75,7 +75,7 @@ func (commonProtocol *CommonProtocol) registerEx(err error, packet nex.PacketInt
 			var address string
 			var port uint16
 
-			// * We have to duplicate this because Go automatically breaks on switch statements
+
 			switch clientAddress := connection.Address().(type) {
 			case *net.UDPAddr:
 				address = clientAddress.IP.String()
