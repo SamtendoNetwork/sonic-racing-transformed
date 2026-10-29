@@ -1,7 +1,6 @@
 package nexserver
 
 import (
-	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/constants"
 	"github.com/PretendoNetwork/nex-go/v2/types"
 	commonticketgranting "github.com/PretendoNetwork/nex-protocols-common-go/v2/ticket-granting"
@@ -9,21 +8,11 @@ import (
 	"github.com/nex-server/sonic-transformed/globals"
 )
 
-
-
 func registerAuthenticationProtocols() {
 	ticketGrantingProtocol := ticketgranting.NewProtocol()
 	globals.AuthenticationEndpoint.RegisterServiceProtocol(ticketGrantingProtocol)
 
 	commonTicketGranting := commonticketgranting.NewCommonProtocol(ticketGrantingProtocol)
-
-
-
-
-
-
-
-
 
 	secureStationURL := types.NewStationURL("")
 	secureStationURL.SetURLType(constants.StationURLPRUDPS)
@@ -38,28 +27,15 @@ func registerAuthenticationProtocols() {
 	commonTicketGranting.SecureStationURL = secureStationURL
 	commonTicketGranting.SecureServerAccount = globals.SecureServerAccount
 
-
-
-
 	commonTicketGranting.BuildName = types.NewString(globals.BuildName)
 
-
-
-
 	commonTicketGranting.SessionKeyLength = 32
-
 
 	commonTicketGranting.ValidateLoginData = globals.ValidateLoginData
 	commonTicketGranting.DisableInsecureLogin()
 
-	ticketGrantingProtocol.SetHandlerRequestTicket(rejectTokenlessTicket)
-
+	guardTicketRequests(ticketGrantingProtocol, globals.AuthenticationEndpoint, globals.SecureServerAccount.PID, globals.ValidateLoginData)
 
 	ticketGrantingProtocol.SetHandlerGetPID(getPID)
 	ticketGrantingProtocol.SetHandlerGetName(getName)
-}
-
-
-func rejectTokenlessTicket(err error, packet nex.PacketInterface, callID uint32, source types.PID, target types.PID) (*nex.RMCMessage, *nex.Error) {
-	return nil, nex.NewError(nex.ResultCodes.Authentication.ValidationFailed, "Use LoginEx with an accounts-issued NEX token")
 }
